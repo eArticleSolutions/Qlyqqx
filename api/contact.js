@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = JSON.parse(req.body);
+    const body = req.body;
 
     const { name, email, company, request } = body;
 
