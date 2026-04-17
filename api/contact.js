@@ -1,7 +1,7 @@
 import { Client } from "@notionhq/client";
 
 const notion = new Client({
-  auth: process.env.ntn_h67571527694zPKq1b6eaj1SgcMOn866u1SAWJgrU5tcKm,
+  auth: process.env.NOTION_API_KEY,
 });
 
 export default async function handler(req, res) {
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     await notion.pages.create({
       parent: {
-        database_id: process.env.a440ca9a734b4177bf4fbbe58cb15e9d,
+        database_id: process.env.NOTION_DATABASE_ID,
       },
       properties: {
         Name: {
