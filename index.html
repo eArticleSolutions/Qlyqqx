@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qlyqqx — Build Less. Automate More.</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #141414;
+            --accent-color: #00f5b8;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #262626;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(0, 245, 184, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .logo {
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 500;
+            margin-bottom: 40px;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 245, 184, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .section {
+            margin-top: 100px;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 20px;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .highlight-text {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .process-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (max-width: 850px) {
+            .grid, .process-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            border-radius: 16px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .card h3 {
+            color: var(--accent-color);
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 245, 184, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--accent-color);
+        }
+
+        .icon-box svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .list-items {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .list-items li {
+            margin-bottom: 16px;
+            padding-left: 30px;
+            position: relative;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .list-items li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .step-content strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .form-box {
+            margin-top: 60px;
+            padding: 48px;
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 20px;
+            background: #0d0d0d;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(0, 245, 184, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 100px;
+            padding: 60px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            letter-spacing: 0.05em;
+        }
+
+        footer strong {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .form-box { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <img src="qlyqqx_green_logo.png" alt="Qlyqqx Logo" class="logo">
+        <h1>Automation That Works<br>While You Work</h1>
+        <p class="hero-subtitle">Stop maintaining. Start building.</p>
+        <img src="qlyqqx_hero_image.png" alt="Qlyqqx Hero Image" class="hero-image">
+    </header>
+
+    <div class="section">
+        <h2>The Problem: The "Silent" Grind</h2>
+        <p>There’s a moment in business nobody talks about. It isn’t a dramatic crash or a broken system. It’s just… <span class="highlight-text">repetition.</span></p>
+        <p>You open your laptop and already know what’s waiting:</p>
+        <ul class="list-items">
+            <li>Messages that need manual replies.</li>
+            <li>Leads that need endless sorting.</li>
+            <li>Data that needs to move from Point A to Point B.</li>
+        </ul>
+        <p>Individually, these tasks feel too small to fix. Collectively, they are the reason you’ve stopped moving forward and started just "keeping things together."</p>
+    </div>
+
+    <div class="section">
+        <h2>The Tipping Point</h2>
+        <p class="highlight-text" style="font-size: 1.4rem;">You aren't lacking ideas. You're lacking time.</p>
+        <p>You’ve seen the potential of AI agents and automated workflows. You’ve probably even tried a few tools yourself. But tools aren’t the solution—systems are. The problem is that most "out of the box" software isn't built for the specific, messy way you actually work.</p>
+    </div>
+
+    <div class="section">
+        <h2>The Solution: Qlyqqx</h2>
+        <p class="highlight-text">We build systems around your reality.</p>
+        <p>We take your workflow—however rough, incomplete, or hard to explain—and turn it into a functional reality.</p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>Custom Builds</h3>
+                <p>No templates. No "pre-defined" packages.</p>
+            </div>
+            <div class="card">
+                <h3>Seamless Integration</h3>
+                <p>We connect the pieces you’re currently holding together manually.</p>
+            </div>
+            <div class="card">
+                <h3>Silent Operation</h3>
+                <p>Entire chunks of work simply vanish from your daily to-do list.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>The Toolkit</h2>
+        <p class="highlight-text">The tech matters, but the result matters more.</p>
+        <p>We utilize industry-leading tools like <strong>n8n</strong>, <strong>OpenClaw</strong>, and <strong>Hermes</strong>. But we don't lead with the tech—we lead with the solution. The goal is simple: You stop doing work that shouldn't exist anymore.</p>
+    </div>
+
+    <div class="section">
+        <h2>The Process</h2>
+        
+        <div class="grid process-grid">
+            <div class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <div class="step-content">
+                    <strong>Describe</strong>
+                    <p>You tell us what you want (the messier, the better).</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                </div>
+                <div class="step-content">
+                    <strong>Define</strong>
+                    <p>We respond quickly and hop on a call to find the "edges" of your workflow.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                </div>
+                <div class="step-content">
+                    <strong>Build</strong>
+                    <p>We develop the system.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                </div>
+                <div class="step-content">
+                    <strong>Execute</strong>
+                    <p>Things that required your attention now happen in the background.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>The Result</h2>
+        <p class="highlight-text" style="font-size: 1.4rem;">Back in control.</p>
+        <p>When the automation is done, the difference is immediate. You are no longer caught in the middle of your own processes; you are finally standing over them.</p>
+    </div>
+
+    <div class="section">
+        <h2>Call to Action</h2>
+        <p class="highlight-text">If it repeats, it can be automated.</p>
+        <p>Stop accepting manual labor as "just part of the work." Describe your bottleneck, and we’ll take it from there.</p>
+
+        <div class="form-box">
+            <form action="/api/contact" method="POST">
+                <input name="Your Name" placeholder="Your Name" required />
+                <input name="Email Address" type="email" placeholder="Email Address" required />
+                <input name="Company Name (optional)" placeholder="Company Name (optional)" />
+                <textarea name="What would you like to automate?" rows="5" placeholder="What would you like to automate?" required></textarea>
+                <button type="submit">Request Automation</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>[ <strong>Build Less. Automate More.</strong> ]</p>
+    </footer>
+</div>
+
+<script>
+document.querySelector("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+
+  const payload = {
+    name: formData.get("Your Name"),
+    email: formData.get("Email Address"),
+    company: formData.get("Company Name (optional)"),
+    request: formData.get("What would you like to automate?")
+  };
+
+  const res = await fetch("/api/contact", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (res.ok) {
+    alert("Request sent");
+    e.target.reset();
+  } else {
+    alert("Something went wrong");
+  }
+});
+</script>
+
+</body>
+</html>
