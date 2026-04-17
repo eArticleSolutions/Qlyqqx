@@ -405,7 +405,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
     request: formData.get("What would you like to automate?")
   };
 
-  const res = await fetch("/api/contact", {
+  await fetch("/api/contact", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -413,12 +413,8 @@ document.querySelector("form").addEventListener("submit", async (e) => {
     body: JSON.stringify(payload)
   });
 
-  if (res.ok) {
-    alert("Request sent");
-    e.target.reset();
-  } else {
-    alert("Something went wrong");
-  }
+  alert("Request sent");
+  e.target.reset();
 });
 </script>
 
