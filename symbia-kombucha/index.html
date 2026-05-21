@@ -748,10 +748,18 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
 
 @media (max-width: 480px) {
   .slide {
-    padding: 6.5rem 1.2rem;
+    padding: 6.5rem 3.2rem;
   }
   .nav-arrow {
-    display: none; /* Swipe transition is preferred on very narrow devices */
+    width: 40px;
+    height: 40px;
+    opacity: 0.4;
+  }
+  .nav-arrow.prev {
+    left: 0.4rem;
+  }
+  .nav-arrow.next {
+    right: 0.4rem;
   }
   
   .brand {
