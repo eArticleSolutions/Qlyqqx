@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symbia · Sourdough — The Memory of Your Starter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Sourdough palette */
+  --crumb:#1F1813; --crust:#2E2218; --rye:#6B4423;
+  --gold:#D4A574; --dough:#E8C896; --char:#A0421C;
+  --flour:#F5EBD8; --linen:#8A7560; --dim:#7A6650;
+  --ease:cubic-bezier(.7,.05,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--crumb);color:var(--flour);-webkit-font-smoothing:antialiased}
+
+/* Flour grain overlay + vignette */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:200;mix-blend-mode:overlay;opacity:.18;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.82 0 0 0 0 0.55 0 0 0 0.55 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:150;
+  background:radial-gradient(ellipse at center, transparent 45%, rgba(15,10,7,.7) 100%);
+}
+
+.deck{position:relative;width:100vw;height:100vh;background:var(--crumb)}
+.slide{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;overflow:hidden;
+  transition:opacity .9s var(--ease);
+  padding:5rem 2rem 6rem;
+}
+.slide > *:not(.slide-bg):not(.mesh):not(.dust){position:relative;z-index:5}
+.slide.active{opacity:1;pointer-events:all}
+
+.slide-bg{
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  transform:scale(1.08);
+  animation:kenburns 24s var(--ease) infinite alternate;
+}
+.slide-bg::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at center, rgba(31,24,19,.45) 0%, rgba(31,24,19,.84) 70%, rgba(15,10,7,.96) 100%);
+}
+@keyframes kenburns{
+  0%{transform:scale(1.08) translate(0,0)}
+  100%{transform:scale(1.14) translate(-1.5%,1%)}
+}
+
+#s1  .slide-bg{background-image:url("img/bg-loaf-hero.jpg")}
+#s2  .slide-bg{background-image:url("img/bg-starter-jar.jpg")}
+#s3  .slide-bg{background-image:url("img/bg-three-loaves.jpg")}
+#s4  .slide-bg{background-image:url("img/bg-variables.jpg")}
+#s5  .slide-bg{background-image:url("img/bg-crumb-macro.jpg")}
+#s6  .slide-bg{background-image:url("img/bg-crumb-macro.jpg")}
+#s7  .slide-bg{background-image:url("img/bg-scoring.jpg")}
+#s8  .slide-bg{background-image:url("img/bg-blowout.jpg")}
+#s9  .slide-bg{background-image:url("img/bg-schedule.jpg")}
+#s10 .slide-bg{background-image:url("img/bg-loaves-row.jpg")}
+#s11 .slide-bg{background-image:url("img/bg-community.jpg")}
+#s12 .slide-bg{background-image:url("img/bg-scoring.jpg")}
+#s13 .slide-bg{background-image:url("img/bg-community.jpg")}
+#s14 .slide-bg{background-image:url("img/bg-loaf-hero.jpg")}
+
+#s1  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(31,24,19,.55) 0%, rgba(31,24,19,.9) 70%, rgba(15,10,7,.97) 100%)}
+#s2  .slide-bg::after{background:linear-gradient(90deg, rgba(31,24,19,.95) 30%, rgba(31,24,19,.55) 100%)}
+#s3  .slide-bg::after{background:linear-gradient(180deg, rgba(31,24,19,.55) 0%, rgba(31,24,19,.92) 100%)}
+#s4  .slide-bg::after{background:radial-gradient(ellipse at 70% 50%, rgba(31,24,19,.55) 0%, rgba(31,24,19,.94) 80%)}
+#s5  .slide-bg::after{background:radial-gradient(ellipse at 70% 50%, rgba(31,24,19,.55) 0%, rgba(31,24,19,.92) 70%)}
+#s6  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(31,24,19,.7) 0%, rgba(31,24,19,.94) 75%)}
+#s7  .slide-bg::after{background:linear-gradient(90deg, rgba(31,24,19,.55) 0%, rgba(31,24,19,.94) 65%)}
+#s8  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(80,30,12,.45) 0%, rgba(31,24,19,.95) 75%)}
+#s9  .slide-bg::after{background:linear-gradient(90deg, rgba(31,24,19,.92) 35%, rgba(31,24,19,.55) 100%)}
+#s10 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(31,24,19,.6) 0%, rgba(31,24,19,.92) 80%)}
+#s11 .slide-bg::after{background:linear-gradient(90deg, rgba(31,24,19,.55) 0%, rgba(31,24,19,.94) 65%)}
+#s12 .slide-bg::after{background:linear-gradient(90deg, rgba(31,24,19,.92) 35%, rgba(31,24,19,.6) 100%)}
+#s13 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(31,24,19,.6) 0%, rgba(31,24,19,.92) 80%)}
+#s14 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(31,24,19,.5) 0%, rgba(31,24,19,.88) 70%, rgba(15,10,7,.97) 100%)}
+
+.mesh{
+  position:absolute;inset:-10%;z-index:1;
+  background:
+    radial-gradient(at 20% 30%, rgba(212,165,116,.18), transparent 55%),
+    radial-gradient(at 80% 70%, rgba(160,66,28,.10), transparent 60%);
+  filter:blur(60px);mix-blend-mode:screen;
+  animation:meshShift 18s var(--ease) infinite alternate;
+  pointer-events:none;
+}
+@keyframes meshShift{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(2%,-3%) scale(1.05)}
+  100%{transform:translate(-3%,2%) scale(1.08)}
+}
+
+/* Flour-dust motes drifting up */
+.dust{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.mote{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(245,235,216,.65), rgba(232,200,150,.05) 70%);
+  filter:blur(.5px);
+  animation:drift linear infinite;
+}
+@keyframes drift{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:.8}
+  50%{transform:translateY(-50vh) translateX(15px);opacity:.5}
+  90%{opacity:.3}
+  100%{transform:translateY(-110vh) translateX(-25px);opacity:0}
+}
+
+/* Reveal helpers */
+.reveal-mask{display:inline-block;overflow:hidden;vertical-align:bottom}
+.reveal-mask > span{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease-out)}
+.slide.active .reveal-mask > span{transform:translateY(0)}
+.slide.active .reveal-mask:nth-child(2) > span{transition-delay:.1s}
+.slide.active .reveal-mask:nth-child(3) > span{transition-delay:.2s}
+.slide.active .reveal-mask:nth-child(4) > span{transition-delay:.3s}
+
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .9s var(--ease-out), transform .9s var(--ease-out)}
+.slide.active .fade-up{opacity:1;transform:translateY(0)}
+.slide.active .fade-up.d1{transition-delay:.4s}
+.slide.active .fade-up.d2{transition-delay:.6s}
+.slide.active .fade-up.d3{transition-delay:.8s}
+.slide.active .fade-up.d4{transition-delay:1.0s}
+.slide.active .fade-up.d5{transition-delay:1.2s}
+.slide.active .fade-up.d6{transition-delay:1.4s}
+
+/* Typography */
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;display:inline-flex;align-items:center;gap:.8rem}
+.eyebrow::before{content:"";width:36px;height:1px;background:var(--gold)}
+h1.headline,h2.headline{font-family:'Fraunces',serif;font-weight:300;line-height:.98;letter-spacing:-.035em;color:var(--flour)}
+h1.headline em,h2.headline em{font-style:italic;color:var(--dough);font-weight:400}
+h1.headline{font-size:clamp(2.4rem,6vw,5.4rem)}
+h2.headline{font-size:clamp(2rem,4.6vw,3.8rem)}
+.lede{font-size:1.05rem;line-height:1.75;color:var(--flour);font-weight:300;max-width:560px}
+.lede b{color:var(--dough);font-weight:500}
+
+/* Hook */
+.hook{
+  margin-top:2rem;display:flex;align-items:baseline;gap:.9rem;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+  font-size:clamp(1.1rem,1.6vw,1.45rem);color:var(--dough);
+}
+.hook::before{
+  content:"↳";font-family:'JetBrains Mono',monospace;font-style:normal;
+  color:var(--gold);font-size:1.3rem;opacity:.85;
+}
+.hook em{color:var(--flour);font-weight:500;text-decoration:underline;text-decoration-color:rgba(212,165,116,.55);text-underline-offset:6px;text-decoration-thickness:1px}
+
+/* Brand chrome */
+.brand{position:fixed;top:1.4rem;left:1.6rem;display:flex;align-items:center;gap:.7rem;z-index:300;text-decoration:none}
+.brand img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(212,165,116,.55))}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-text .nm{font-family:'Fraunces',serif;font-style:italic;font-size:.95rem;color:var(--gold);letter-spacing:.04em}
+.brand-text .by{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;color:var(--linen);text-transform:uppercase;margin-top:2px}
+.slide-num{position:fixed;top:1.8rem;right:2.2rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--linen);z-index:300}
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--dough));z-index:301;transition:width .8s var(--ease);box-shadow:0 0 14px rgba(212,165,116,.7);width:7.14%}
+
+/* Nav */
+.nav{position:fixed;left:1.5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:1rem;z-index:300;background:rgba(31,24,19,.55);backdrop-filter:blur(12px);padding:1.2rem .5rem;border:1px solid rgba(212,165,116,.22);border-radius:50px}
+.nav-btn{width:28px;height:28px;border:none;background:transparent;color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;border-radius:50%;transition:background .2s}
+.nav-btn:hover{background:rgba(212,165,116,.18)}
+.nav-btn:disabled{opacity:.25;cursor:not-allowed}
+.dots{display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--linen);transition:all .4s var(--ease);cursor:pointer;opacity:.5}
+.dot.active{background:var(--gold);height:18px;border-radius:3px;opacity:1;box-shadow:0 0 10px rgba(212,165,116,.6)}
+
+/* SLIDE 1 — HERO */
+#s1{flex-direction:column;text-align:center;gap:1.8rem}
+#s1 .hero-logo{
+  width:min(200px,20vw);max-height:18vh;object-fit:contain;
+  filter:drop-shadow(0 10px 40px rgba(212,165,116,.55));
+  opacity:0;transform:translateY(20px) scale(.95);
+  transition:opacity 1.2s var(--ease-out), transform 1.4s var(--ease-out);
+}
+.slide.active#s1 .hero-logo{opacity:1;transform:translateY(0) scale(1)}
+#s1 h1{max-width:1100px}
+#s1 .lede{margin:0 auto;text-align:center;max-width:680px}
+#s1 .eyebrow{justify-content:center}
+
+/* Generic card-style panels */
+.card{
+  position:relative;padding:1.8rem;
+  background:linear-gradient(180deg,rgba(46,34,24,.85),rgba(31,24,19,.94));
+  border:1px solid rgba(212,165,116,.28);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px rgba(212,165,116,.08);
+  backdrop-filter:blur(8px);
+}
+
+/* SLIDE 2 — STARTER LOG */
+#s2 .wrap{position:relative;z-index:5;width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:5rem;align-items:center}
+.log-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:.6rem}
+.log-card .title{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--flour);font-weight:300;margin-bottom:1.2rem}
+.log-list{display:flex;flex-direction:column;gap:.55rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--flour)}
+.log-list .row{display:grid;grid-template-columns:60px 1fr auto;gap:.8rem;padding:.45rem .2rem;border-bottom:1px dashed rgba(212,165,116,.18)}
+.log-list .row:last-child{border-bottom:none}
+.log-list .t{color:var(--linen)}
+.log-list .v{color:var(--dough);text-align:right}
+.log-list .row.peak .v{color:var(--char);font-weight:500}
+
+/* SLIDE 3 — SAME RECIPE CARDS */
+#s3 .wrap{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:2.4rem;align-items:flex-start}
+#s3 .head-row{display:flex;flex-direction:column;gap:1rem;max-width:780px}
+.bake-rail{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;width:100%}
+.bake-card{
+  position:relative;padding:1.6rem 1.5rem;border:1px solid rgba(212,165,116,.2);
+  background:linear-gradient(180deg,rgba(46,34,24,.85),rgba(31,24,19,.88));
+  border-radius:5px;display:flex;flex-direction:column;gap:.6rem;
+  backdrop-filter:blur(6px);
+}
+.bake-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--linen);text-transform:uppercase}
+.bake-card .name{font-family:'Fraunces',serif;font-size:1.45rem;color:var(--flour);font-weight:300;letter-spacing:-.01em}
+.bake-card .desc{font-size:.88rem;color:var(--linen);font-weight:300;line-height:1.55}
+.bake-card .pill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--char);padding-top:.6rem;margin-top:.3rem;border-top:1px dashed rgba(160,66,28,.35)}
+.bake-card.good .pill{color:var(--dough);border-top-color:rgba(232,200,150,.35)}
+.bake-card.warn .pill{color:var(--gold);border-top-color:rgba(212,165,116,.35)}
+
+/* SLIDE 4 — VARIABLES */
+#s4 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.4rem;text-align:center}
+.var-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;width:100%;max-width:1080px}
+.var-stat{
+  padding:1.6rem 1.2rem;border:1px solid rgba(212,165,116,.28);
+  background:linear-gradient(180deg,rgba(46,34,24,.7),rgba(31,24,19,.9));
+  border-radius:6px;text-align:left;backdrop-filter:blur(6px);
+}
+.var-stat .l{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--linen);text-transform:uppercase}
+.var-stat .big{font-family:'Fraunces',serif;font-size:2.4rem;color:var(--gold);font-weight:300;line-height:1;letter-spacing:-.02em;margin-top:.6rem}
+.var-stat .d{font-size:.85rem;color:var(--flour);font-weight:300;margin-top:.6rem;line-height:1.5}
+
+/* SLIDE 5 — VIDEO */
+#s5 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;gap:1.6rem;align-items:center;text-align:center}
+.video-frame{
+  position:relative;width:100%;max-width:760px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;
+  border:1px solid rgba(212,165,116,.32);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(212,165,116,.12);
+  background:#000;
+}
+.video-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.video-frame .placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  background:radial-gradient(circle at center, rgba(46,34,24,1), rgba(31,24,19,1) 80%);
+}
+.play{
+  width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,var(--dough),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(212,165,116,.6);cursor:pointer;
+  transition:transform .3s var(--ease-out);
+}
+.play:hover{transform:scale(1.08)}
+.play::before{
+  content:"";width:0;height:0;margin-left:6px;
+  border-left:24px solid var(--crumb);
+  border-top:14px solid transparent;border-bottom:14px solid transparent;
+}
+.video-frame .cap{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--linen);text-transform:uppercase}
+.video-frame .corners::before,.video-frame .corners::after{content:"";position:absolute;width:24px;height:24px;border:1px solid var(--gold)}
+.video-frame .corners::before{top:14px;left:14px;border-right:none;border-bottom:none}
+.video-frame .corners::after{bottom:14px;right:14px;border-left:none;border-top:none}
+
+/* SLIDE 6 — CHAT */
+#s6 .wrap{width:100%;max-width:980px;display:flex;flex-direction:column;gap:1.6rem}
+.chat{
+  background:linear-gradient(180deg,rgba(46,34,24,.92),rgba(31,24,19,.94));
+  border:1px solid rgba(212,165,116,.25);border-radius:8px;
+  padding:1.8rem;display:flex;flex-direction:column;gap:1.1rem;
+  backdrop-filter:blur(8px);box-shadow:0 30px 80px rgba(0,0,0,.55);
+}
+.chat-row{display:flex;gap:1rem;align-items:flex-start}
+.chat-row .who{
+  flex:none;width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;
+}
+.chat-row.user .who{background:rgba(212,165,116,.14);color:var(--dough);border:1px solid rgba(212,165,116,.4)}
+.chat-row.ai .who{background:rgba(160,66,28,.12);color:var(--char);border:1px solid rgba(160,66,28,.4);overflow:hidden;padding:0}
+.chat-row.ai .who img{width:100%;height:100%;object-fit:contain;padding:4px}
+.bubble-msg{
+  flex:1;padding:1rem 1.2rem;border-radius:6px;font-size:1rem;line-height:1.6;
+  background:rgba(245,235,216,.03);border:1px solid rgba(212,165,116,.14);color:var(--flour);
+}
+.bubble-msg.q{font-family:'Fraunces',serif;font-style:italic;color:var(--flour);font-size:1.1rem}
+.bubble-msg .meta{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;
+  letter-spacing:.25em;color:var(--linen);margin-bottom:.5rem;text-transform:uppercase;
+}
+.bubble-msg b{color:var(--dough);font-weight:500}
+.bubble-msg .flag{color:var(--char);font-weight:500}
+
+/* SLIDE 7 — BLUEPRINT */
+#s7 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.1fr;gap:4rem;align-items:center}
+.blueprint{
+  position:relative;padding:2rem;
+  background:linear-gradient(180deg,rgba(46,34,24,.7),rgba(31,24,19,.92));
+  border:1px solid rgba(212,165,116,.3);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px rgba(212,165,116,.06);
+}
+.blueprint::before{
+  content:"NEXT BAKE · DESIGNED";
+  position:absolute;top:-10px;left:1.5rem;background:var(--crumb);
+  padding:0 .8rem;font-family:'JetBrains Mono',monospace;
+  font-size:.55rem;letter-spacing:.3em;color:var(--gold);
+}
+.spec-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.05rem 0;border-bottom:1px dashed rgba(212,165,116,.2);gap:1rem;
+}
+.spec-row:last-child{border-bottom:none}
+.spec-row .k{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--linen);text-transform:uppercase}
+.spec-row .v{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--flour);font-weight:300;text-align:right}
+.spec-row .v small{display:block;font-family:'Inter',sans-serif;font-size:.62rem;color:var(--dough);letter-spacing:.15em;text-transform:uppercase;margin-top:.25rem;font-weight:500}
+
+/* SLIDE 8 — DIAGNOSTIC ALERT */
+#s8 .wrap{width:100%;max-width:1080px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem}
+.alert-card{
+  width:100%;max-width:820px;padding:2.2rem 2.4rem;
+  background:linear-gradient(135deg,rgba(160,66,28,.18),rgba(46,34,24,.94));
+  border:1px solid rgba(160,66,28,.5);border-radius:6px;
+  position:relative;overflow:hidden;text-align:left;
+  box-shadow:0 30px 80px rgba(160,66,28,.18),inset 0 0 0 1px rgba(160,66,28,.1);
+}
+.alert-card::before{
+  content:"⚠";position:absolute;top:1rem;right:1.5rem;font-size:2.2rem;
+  color:var(--char);opacity:.6;
+}
+.alert-card .tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--char);text-transform:uppercase;margin-bottom:1rem}
+.alert-card .observed{font-family:'Fraunces',serif;font-style:italic;font-size:1.35rem;color:var(--flour);margin-bottom:1.5rem;line-height:1.4}
+.alert-card .verdict{
+  display:flex;gap:1.2rem;align-items:flex-start;padding-top:1.4rem;
+  border-top:1px solid rgba(160,66,28,.3);
+}
+.alert-card .verdict .label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;color:var(--linen);text-transform:uppercase;flex:none;min-width:90px;padding-top:.3rem}
+.alert-card .verdict .body{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--dough);line-height:1.5}
+.alert-card .verdict .body b{color:var(--flour);font-weight:500}
+
+/* SLIDE 9 — SCHEDULE TIMELINE */
+#s9 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:4rem;align-items:center}
+.sched-card{
+  padding:1.8rem;background:linear-gradient(180deg,rgba(46,34,24,.85),rgba(31,24,19,.92));
+  border:1px solid rgba(212,165,116,.25);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);backdrop-filter:blur(8px);
+}
+.sched-row{display:grid;grid-template-columns:80px 1fr auto;gap:1rem;align-items:center;padding:.85rem 0;border-bottom:1px dashed rgba(212,165,116,.18)}
+.sched-row:last-child{border-bottom:none}
+.sched-row .when{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.18em;color:var(--gold)}
+.sched-row .what{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--flour);font-weight:300}
+.sched-row .day{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--linen);padding:.3rem .6rem;border-radius:50px;border:1px solid rgba(212,165,116,.25)}
+.sched-row.target .day{color:var(--char);border-color:var(--char)}
+
+/* SLIDE 10 — PRICING */
+#s10 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.4rem;text-align:center}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;width:100%;max-width:980px;text-align:left}
+.price{
+  position:relative;padding:2.2rem;border:1px solid rgba(212,165,116,.25);
+  background:linear-gradient(180deg,rgba(46,34,24,.88),rgba(31,24,19,.92));
+  border-radius:6px;backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;gap:1rem;
+  transition:transform .5s var(--ease-out),border-color .5s;
+}
+.price:hover{transform:translateY(-4px);border-color:rgba(212,165,116,.6)}
+.price.featured{border-color:rgba(232,200,150,.55);box-shadow:0 0 60px rgba(212,165,116,.18)}
+.price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
+.price h3{font-family:'Fraunces',serif;font-weight:300;font-size:2rem;color:var(--flour);letter-spacing:-.02em}
+.price .amount{display:flex;align-items:baseline;gap:.4rem;margin-top:.2rem}
+.price .amount .big{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--dough);font-weight:400;line-height:1}
+.price .amount .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--linen);text-transform:uppercase}
+.price p{font-size:.93rem;line-height:1.6;color:var(--flour);font-weight:300}
+
+/* SLIDE 11 — REFERRALS */
+#s11 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1.05fr 1fr;gap:4.5rem;align-items:center}
+.ref-vis{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.ref-center{
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--dough),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;color:var(--crumb);font-size:1.4rem;font-weight:600;
+  box-shadow:0 0 60px rgba(212,165,116,.7);z-index:3;
+}
+.ref-orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(212,165,116,.32);animation:spin 80s linear infinite}
+.ref-orbit.outer{inset:-8%;animation-duration:120s;animation-direction:reverse;border-color:rgba(212,165,116,.18)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ref-node{
+  position:absolute;width:62px;height:62px;border-radius:50%;
+  background:rgba(46,34,24,.92);border:1px solid rgba(212,165,116,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--dough);
+  letter-spacing:.1em;backdrop-filter:blur(4px);
+}
+.ref-node.n1{top:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n2{top:50%;right:5%;transform:translateY(-50%)}
+.ref-node.n3{bottom:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n4{top:50%;left:5%;transform:translateY(-50%)}
+.ref-roi{
+  position:absolute;bottom:-2rem;left:50%;transform:translateX(-50%);
+  font-family:'Fraunces',serif;font-style:italic;color:var(--dough);
+  font-size:1.3rem;white-space:nowrap;
+}
+.metric-row{display:flex;flex-direction:column;gap:.9rem;margin-top:1.5rem}
+.metric{display:flex;align-items:baseline;gap:1rem;padding:1rem 1.2rem;background:rgba(46,34,24,.5);border:1px solid rgba(212,165,116,.18);border-radius:5px}
+.metric .num{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--dough);font-weight:400;min-width:90px}
+.metric .desc{font-size:.95rem;color:var(--flour);font-weight:300}
+
+/* SLIDE 12 — DFY */
+#s12 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.dfy-steps{display:flex;flex-direction:column;gap:.9rem;margin-top:1.6rem}
+.dfy-step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.1rem;background:rgba(46,34,24,.5);border:1px solid rgba(212,165,116,.18);border-radius:5px}
+.dfy-step .n{flex:none;width:30px;height:30px;border-radius:50%;background:rgba(212,165,116,.15);border:1px solid rgba(212,165,116,.4);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--dough)}
+.dfy-step .t{font-size:.95rem;color:var(--flour);font-weight:300;line-height:1.5}
+.dfy-step .t b{color:var(--dough);font-weight:500}
+.dfy-price{
+  padding:2.4rem;border:1px solid rgba(232,200,150,.55);border-radius:8px;
+  background:linear-gradient(180deg,rgba(46,34,24,.9),rgba(31,24,19,.95));
+  box-shadow:0 0 80px rgba(212,165,116,.18);text-align:center;
+}
+.dfy-price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
+.dfy-price h3{font-family:'Fraunces',serif;font-weight:300;font-size:1.9rem;color:var(--flour);margin-top:.5rem}
+.dfy-price .big{font-family:'Fraunces',serif;font-size:4rem;color:var(--dough);font-weight:400;line-height:1;margin-top:1rem}
+.dfy-price .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.18em;color:var(--linen);text-transform:uppercase;margin-top:.3rem}
+.dfy-price .note{font-size:.85rem;color:var(--linen);font-weight:300;margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(212,165,116,.2);line-height:1.55}
+.dfy-price .note b{color:var(--flour)}
+
+/* SLIDE 13 — COMMUNITY */
+#s13 .wrap{width:100%;max-width:1240px;display:flex;flex-direction:column;gap:2.4rem}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.feat{
+  padding:1.4rem 1.4rem 1.5rem;background:linear-gradient(180deg,rgba(46,34,24,.7),rgba(31,24,19,.85));
+  border:1px solid rgba(212,165,116,.18);border-radius:5px;
+  display:flex;flex-direction:column;gap:.5rem;
+  transition:border-color .4s,transform .4s;
+}
+.feat:hover{border-color:rgba(212,165,116,.5);transform:translateY(-2px)}
+.feat .icon{
+  width:36px;height:36px;border-radius:50%;background:rgba(212,165,116,.14);
+  border:1px solid rgba(212,165,116,.4);display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-style:italic;color:var(--dough);font-size:1.1rem;margin-bottom:.5rem;
+}
+.feat h4{font-family:'Fraunces',serif;font-weight:400;font-size:1.1rem;color:var(--flour);letter-spacing:-.01em}
+.feat p{font-size:.85rem;line-height:1.55;color:var(--linen);font-weight:300}
+
+/* SLIDE 14 — FINAL CTA */
+#s14{flex-direction:column;text-align:center;gap:2rem}
+#s14 .ring{
+  position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(212,165,116,.22);
+  transform:translate(-50%,-50%);pointer-events:none;animation:pulse 6s var(--ease) infinite;
+}
+#s14 .ring:nth-child(1){width:520px;height:520px}
+#s14 .ring:nth-child(2){width:760px;height:760px;animation-delay:1.5s;border-color:rgba(212,165,116,.13)}
+#s14 .ring:nth-child(3){width:1000px;height:1000px;animation-delay:3s;border-color:rgba(212,165,116,.07)}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+#s14 .emblem{width:110px;height:auto;filter:drop-shadow(0 8px 40px rgba(212,165,116,.65));z-index:5;position:relative}
+#s14 h2{position:relative;z-index:5;max-width:1000px}
+#s14 .cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:5}
+.cta{
+  display:inline-flex;align-items:center;gap:.7rem;
+  padding:1.1rem 1.9rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.3em;
+  text-transform:uppercase;text-decoration:none;border-radius:50px;
+  border:1px solid rgba(212,165,116,.5);color:var(--flour);
+  transition:all .35s var(--ease-out);background:rgba(31,24,19,.55);backdrop-filter:blur(8px);
+}
+.cta:hover{transform:translateY(-2px);border-color:var(--dough);box-shadow:0 12px 30px rgba(212,165,116,.35)}
+.cta.primary{
+  background:linear-gradient(135deg,var(--dough),var(--gold));color:var(--crumb);border-color:transparent;
+  font-weight:600;box-shadow:0 12px 40px rgba(212,165,116,.45);
+}
+.cta.primary:hover{box-shadow:0 18px 60px rgba(212,165,116,.65)}
+.cta .arr{transition:transform .3s}
+.cta:hover .arr{transform:translateX(4px)}
+#s14 .closer{font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--linen);position:relative;z-index:5}
+
+/* Hint */
+.scroll-hint{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--linen);text-transform:uppercase;z-index:300;opacity:.7}
+
+/* Responsive */
+@media(max-width:900px){
+  .slide{padding:5rem 1.2rem 6rem}
+  #s2 .wrap,#s7 .wrap,#s9 .wrap,#s11 .wrap,#s12 .wrap{grid-template-columns:1fr;gap:2.5rem}
+  .bake-rail,.feat-grid,.price-grid,.var-grid{grid-template-columns:1fr 1fr}
+  h1.headline{font-size:2.2rem}
+  h2.headline{font-size:1.85rem}
+}
+</style>
+</head>
+<body>
+
+<a class="brand" href="#">
+  <img src="img/symbia-emblem.png" alt="Symbia">
+  <span class="brand-text">
+    <span class="nm">Symbia</span>
+    <span class="by">Sourdough · By Qlyqqx</span>
+  </span>
+</a>
+<div class="slide-num" id="slideNum">01 — 14</div>
+<div class="progress" id="progress"></div>
+
+<div class="deck">
+
+<!-- ───── SLIDE 1: HERO ───── -->
+<div class="slide active" id="s1">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d1"></div>
+  <img class="hero-logo" src="img/symbia-logo.png" alt="Symbia — Memory of Your Starter">
+  <div class="eyebrow fade-up d1">For Home Bakers · Starter Keepers</div>
+  <h1 class="headline">
+    <span class="reveal-mask"><span>You've kept it alive for months.</span></span><br>
+    <span class="reveal-mask"><span>It's <em>wiser</em> than you think.</span></span>
+  </h1>
+  <p class="lede fade-up d3">Named. Fed. Moved house with you. Survived every flour change. Somewhere in that jar is the formula for the loaf you've been chasing — your starter just can't read it back to you.</p>
+  <div class="hook fade-up d4">What if it <em>could?</em></div>
+</div>
+
+<!-- ───── SLIDE 2: STARTER LOG ───── -->
+<div class="slide" id="s2">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d2"></div>
+  <div class="wrap">
+    <div class="card log-card fade-up">
+      <div class="label">Starter · Last 7 Feeds</div>
+      <div class="title">It's been logging. You haven't.</div>
+      <div class="log-list">
+        <div class="row"><span class="t">Mon 06:00</span><span>1:5:5 · 23°C</span><span class="v">peak 5h</span></div>
+        <div class="row"><span class="t">Tue 07:30</span><span>1:5:5 · 21°C</span><span class="v">peak 6h</span></div>
+        <div class="row"><span class="t">Wed 06:15</span><span>1:5:5 · 18°C</span><span class="v">peak 8h</span></div>
+        <div class="row peak"><span class="t">Thu 07:00</span><span>1:5:5 · 17°C · new flour</span><span class="v">peak 9h 20m</span></div>
+        <div class="row"><span class="t">Fri 06:45</span><span>1:5:5 · 19°C</span><span class="v">peak 7h</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow fade-up">The Starter's Secret</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Every feed is</span></span><br>
+        <span class="reveal-mask"><span>a <em>data point.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Hooch is a signal. Peak timing is a signal. Rise rate is a signal. Your starter responds to every variable — slower at 17°C, sharper after a long gap. <b>It's been logging for months.</b></p>
+      <div class="hook fade-up d4">What does the log <em>say?</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 3: SAME RECIPE ───── -->
+<div class="slide" id="s3">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d3"></div>
+  <div class="wrap">
+    <div class="head-row">
+      <div class="eyebrow fade-up">Same Recipe · Different Loaf</div>
+      <h2 class="headline">
+        <span class="reveal-mask"><span>Twenty bakes.</span></span><br>
+        <span class="reveal-mask"><span>Never the <em>same loaf.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Same flour. Same starter %. Same bulk on the recipe card. Open crumb one week. Gummy and dense the next. Blowout the week after. Nothing connects loaf 7 to loaf 14 to loaf 20.</p>
+    </div>
+    <div class="bake-rail">
+      <div class="bake-card good fade-up d3">
+        <span class="label">Bake · 07</span>
+        <span class="name">Open crumb</span>
+        <span class="desc">4h 30m bulk · 23°C kitchen · starter at peak. Ear opened clean.</span>
+        <span class="pill">→ A win you can't repeat</span>
+      </div>
+      <div class="bake-card warn fade-up d4">
+        <span class="label">Bake · 14</span>
+        <span class="name">Gummy crumb</span>
+        <span class="desc">Same 4h 30m bulk · 19°C kitchen · same starter. Dense and tight.</span>
+        <span class="pill">→ Underproofed by 50 min</span>
+      </div>
+      <div class="bake-card fade-up d5">
+        <span class="label">Bake · 20</span>
+        <span class="name">Side blowout</span>
+        <span class="desc">Same recipe · 17°C shaping room · starter past peak. Tore on the side.</span>
+        <span class="pill">→ Pattern repeats below 19°C</span>
+      </div>
+    </div>
+    <div class="hook fade-up d6" style="margin-top:.4rem">What if <em>one brain</em> connected all twenty?</div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 4: FOUR VARIABLES ───── -->
+<div class="slide" id="s4">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d4"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">The Four Variables</div>
+    <h2 class="headline fade-up d1">
+      Your loaf is a conversation between four variables. <em>Your recipe mentions one.</em>
+    </h2>
+    <p class="lede fade-up d2" style="text-align:center;margin:0 auto">"Bulk 4–5h" was written for 24°C, fresh-peak starter, 12.7% protein. Your kitchen is 18°C. Your starter is 3h past peak. Each variable shifts the window 20–90 minutes — compounding.</p>
+    <div class="var-grid">
+      <div class="var-stat fade-up d3"><div class="l">Ambient</div><div class="big">±90m</div><div class="d">A 4°C swing reshapes your bulk window completely.</div></div>
+      <div class="var-stat fade-up d3"><div class="l">Starter Age</div><div class="big">±45m</div><div class="d">3h past peak ≠ at peak. The math is different.</div></div>
+      <div class="var-stat fade-up d4"><div class="l">Flour Protein</div><div class="big">±30m</div><div class="d">11.9 vs 12.7 changes hydration and timing.</div></div>
+      <div class="var-stat fade-up d4"><div class="l">Humidity</div><div class="big">±20m</div><div class="d">The variable nobody writes about — and it stacks.</div></div>
+    </div>
+    <div class="hook fade-up d5">What if the window <em>found itself?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 5: SYMBIA LIVE ───── -->
+<div class="slide" id="s5">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d5"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Symbia · Live</div>
+    <h2 class="headline fade-up d1" style="margin-bottom:.3rem">
+      Meet the <em>memory</em> of your starter.
+    </h2>
+    <div class="video-frame fade-up d2">
+      <video controls poster="img/symbia-emblem.png">
+        <source src="video/symbia-live.mp4" type="video/mp4">
+      </video>
+      <div class="placeholder">
+        <div class="corners"></div>
+        <div class="play"></div>
+        <div class="cap">Symbia · Live Demo · 02:22</div>
+      </div>
+    </div>
+    <div class="hook fade-up d3">What does it actually <em>know about your bake?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 6: PATTERNS DECODED ───── -->
+<div class="slide" id="s6">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d6"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Ask Anything</div>
+    <h2 class="headline fade-up d1">
+      Finally understand why loaf 20 <em>blew out on the side.</em>
+    </h2>
+    <div class="chat fade-up d2">
+      <div class="chat-row user">
+        <div class="who">YOU</div>
+        <div class="bubble-msg q">
+          <span class="meta">Baker · 21:07</span>
+          "Same 4.5h bulk I always use. Blowout. Gummy crumb. What happened?"
+        </div>
+      </div>
+      <div class="chat-row ai">
+        <div class="who"><img src="img/symbia-emblem.png" alt=""></div>
+        <div class="bubble-msg">
+          <span class="meta">Symbia · 12 bakes referenced</span>
+          Kitchen ran <b>4°C cooler</b> that day. 4.5h at 18°C = <b>30% over-fermentation</b> before shaping. Starter hit peak 35 min early — accelerated further. Real bulk window that day: <b>3h 20m</b>.<br><br><span class="flag">Blowout pattern: 6 of your last 8 happened in rooms below 19°C at shape time.</span>
+        </div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What else is it <em>tracking?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 7: BAKE BLUEPRINT ───── -->
+<div class="slide" id="s7">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d7"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">The Bake Blueprint</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>From guessing the window</span></span><br>
+        <span class="reveal-mask"><span>to <em>hitting it.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Symbia doesn't just remember. It composes. The next bulk, the next fold, the next score — written by every loaf that came before, tuned to today's kitchen.</p>
+      <div class="hook fade-up d4">What about understanding what <em>went wrong?</em></div>
+    </div>
+    <div class="blueprint fade-up d3">
+      <div class="spec-row">
+        <span class="k">Bulk</span>
+        <span class="v">3h 20m <small>↗ ambient 18°C · starter 7h post-feed</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Folds</span>
+        <span class="v">4× coil <small>↗ 40-min intervals</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Cold Retard</span>
+        <span class="v">14h @ 4°C <small>↗ your crumb opens better here</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Score</span>
+        <span class="v">single curve · 35° <small>↗ your ear forms cleanest at this angle</small></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 8: DIAGNOSTIC ───── -->
+<div class="slide" id="s8">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d8"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Post-Bake Diagnostic</div>
+    <h2 class="headline fade-up d1">
+      Send your crumb shot. <em>Get a real answer.</em>
+    </h2>
+    <p class="lede fade-up d2" style="text-align:center;margin:0 auto">Not a forum guess. Pattern-matched against your specific history. Flat ear, gummy crumb, blowout, dense — each one has a cause Symbia can name.</p>
+    <div class="alert-card fade-up d3">
+      <div class="tag">⚠ Symbia · Diagnostic</div>
+      <div class="observed">"Dense even crumb. Good crust colour. No ear. Bulk felt right."</div>
+      <div class="verdict">
+        <div class="label">Verdict</div>
+        <div class="body"><b>Underproofed</b> — bulk short by ~40 min. Starter was below peak at mix time (your last 3 successful bakes used starter at 6–8h post-feed; this one was at 4h). <b>Push next bulk to 4h 10m and mix when starter has tripled.</b></div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What about baking around <em>your actual life?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 9: SCHEDULE ENGINE ───── -->
+<div class="slide" id="s9">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d9"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Bake When You Want To</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Your starter works</span></span><br>
+        <span class="reveal-mask"><span>around <em>your schedule.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Want bread Saturday at 9am? Symbia works backwards from that. Feed time, mix time, fold windows, retard — all calculated from your starter's actual rhythm and your kitchen's actual temp. <b>Not a book schedule. Yours, for this Saturday.</b></p>
+      <div class="hook fade-up d4">What if you don't want to <em>touch the tech?</em></div>
+    </div>
+    <div class="sched-card fade-up d3">
+      <div class="sched-row"><span class="when">Fri 17:00</span><span class="what">Feed starter · 1:5:5</span><span class="day">−16h</span></div>
+      <div class="sched-row"><span class="when">Sat 00:30</span><span class="what">Mix · autolyse 45 min</span><span class="day">−8h</span></div>
+      <div class="sched-row"><span class="when">Sat 01:15</span><span class="what">Bulk + 4 coil folds</span><span class="day">−7h</span></div>
+      <div class="sched-row"><span class="when">Sat 04:30</span><span class="what">Shape · cold retard 4°C</span><span class="day">−4h</span></div>
+      <div class="sched-row target"><span class="when">Sat 09:00</span><span class="what">Score · bake 250°C</span><span class="day">target</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 10: PRICING ───── -->
+<div class="slide" id="s10">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d10"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Yours · Forever</div>
+    <h2 class="headline fade-up d1">
+      Less than three bags of flour you've spent <em>chasing the answer.</em>
+    </h2>
+    <div class="price-grid">
+      <div class="price featured fade-up d2">
+        <span class="tag">One-time · Lifetime</span>
+        <h3>The Symbia Agent</h3>
+        <div class="amount"><span class="big">$97</span><span class="per">/ once</span></div>
+        <p>Your personal, self-learning starter brain. Yours forever — every feed, every bake, every crumb shot. Memory + diagnostic + schedule unlocked.</p>
+      </div>
+      <div class="price fade-up d3">
+        <span class="tag">Membership</span>
+        <h3>Sourdough Masters</h3>
+        <div class="amount"><span class="big">$19</span><span class="per">/ month</span></div>
+        <p>Live bake-alongs, shared starter lineages, flour deals across mills, weekly crumb analysis. The collective brain behind the agent.</p>
+      </div>
+    </div>
+    <div class="hook fade-up d4">But what if it <em>pays for itself?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 11: REFERRALS ───── -->
+<div class="slide" id="s11">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d11"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Build Your Circle · Earn</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Bring in the bakers</span></span><br>
+        <span class="reveal-mask"><span>in your <em>life.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2"><b>30% recurring affiliate</b> — auto-enabled the day you join. No forms, no waiting.</p>
+      <div class="metric-row">
+        <div class="metric fade-up d3"><span class="num">30%</span><span class="desc">recurring · auto-enabled · day one</span></div>
+        <div class="metric fade-up d4"><span class="num">4</span><span class="desc">referrals = <b style="color:var(--dough)">120% ROI</b> — your sub pays you</span></div>
+      </div>
+      <div class="hook fade-up d5" style="margin-top:1.6rem">What if you want <em>none of the tech setup?</em></div>
+    </div>
+    <div class="ref-vis fade-up d3">
+      <div class="ref-orbit outer"></div>
+      <div class="ref-orbit"></div>
+      <div class="ref-center">YOU</div>
+      <div class="ref-node n1">+30%</div>
+      <div class="ref-node n2">+30%</div>
+      <div class="ref-node n3">+30%</div>
+      <div class="ref-node n4">+30%</div>
+      <div class="ref-roi">= 120% ROI</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 12: DONE FOR YOU ───── -->
+<div class="slide" id="s12">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d12"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">White-Glove Setup</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>You handle the loaves.</span></span><br>
+        <span class="reveal-mask"><span>We handle the <em>install.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">For the baker who just wants it working. No terminals. No command lines. Symbia is live and logging your next bake before we leave.</p>
+      <div class="dfy-steps">
+        <div class="dfy-step fade-up d3"><span class="n">1</span><span class="t">You spin up a <b>$5/mo VPS</b> (Contabo or Hostinger — your account, your cost).</span></div>
+        <div class="dfy-step fade-up d4"><span class="n">2</span><span class="t">Share credentials. We <b>install Symbia, configure your starter profile</b>, and walk out.</span></div>
+        <div class="dfy-step fade-up d5"><span class="n">3</span><span class="t">You log in. <b>Symbia is already learning your starter.</b></span></div>
+      </div>
+    </div>
+    <div class="dfy-price fade-up d3">
+      <span class="tag">One-Time · Done-For-You</span>
+      <h3>White-Glove Install</h3>
+      <div class="big">$297</div>
+      <div class="per">/ one-time setup fee</div>
+      <div class="note">Hosting (~$4–6/mo) is yours. <b>Everything else is ours.</b> Symbia license sold separately.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 13: COLLECTIVE BRAIN ───── -->
+<div class="slide" id="s13">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d13"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Sourdough Masters</div>
+    <h2 class="headline fade-up d1" style="max-width:980px">
+      Where the crumb obsessives <em>compare what's inside the loaf.</em>
+    </h2>
+    <div class="feat-grid">
+      <div class="feat fade-up d2"><div class="icon">⏱</div><h4>Live bake-alongs</h4><p>Bake the same recipe in real time with master keepers. Compare crumb on camera.</p></div>
+      <div class="feat fade-up d2"><div class="icon">🜂</div><h4>Starter lineages</h4><p>Trade cuts, trace origins. Your starter's family tree, finally documented.</p></div>
+      <div class="feat fade-up d3"><div class="icon">⌬</div><h4>Flour & mill data</h4><p>Protein numbers and sourcing across dozens of mills — built by bakers, for bakers.</p></div>
+      <div class="feat fade-up d3"><div class="icon">↻</div><h4>Crumb analysis</h4><p>Weekly group sessions. Send a shot, get a verdict, leave with the cause.</p></div>
+      <div class="feat fade-up d4"><div class="icon">★</div><h4>Baker buddy system</h4><p>One-to-one chat with another Master. Bench-to-bench help when something's off at 2am.</p></div>
+      <div class="feat fade-up d4"><div class="icon">⇄</div><h4>Bulk flour deals</h4><p>Group buys on heritage and high-protein flours — Masters-only pricing.</p></div>
+    </div>
+    <div class="hook fade-up d5" style="margin-top:.4rem">What happens when your starter's data <em>meets 500 others?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 14: FINAL CTA ───── -->
+<div class="slide" id="s14">
+  <div class="slide-bg"></div>
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d14"></div>
+  <img class="emblem fade-up" src="img/symbia-emblem.png" alt="Symbia">
+  <div class="eyebrow fade-up d1">The Guessing Ends Here</div>
+  <h2 class="headline">
+    <span class="reveal-mask"><span>Every loaf from now on</span></span><br>
+    <span class="reveal-mask"><span><em>remembers</em> the last.</span></span>
+  </h2>
+  <p class="lede fade-up d2" style="margin:0 auto;text-align:center">Your best loaf was not an accident. It's a formula your history already contains. Symbia reads it back to you.</p>
+  <div class="cta-row fade-up d3">
+    <a href="#" class="cta primary"><span>Get Symbia · $97</span> <span class="arr">→</span></a>
+    <a href="#" class="cta"><span>Join Sourdough Masters · $19/mo</span> <span class="arr">→</span></a>
+  </div>
+  <div class="closer fade-up d4">Symbia · The Memory of Your Starter</div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" disabled>←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn">→</button>
+</div>
+<div class="scroll-hint">Scroll · Arrows · Space</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('dots');
+const total=slides.length;
+let current=0;
+for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
+const dots=document.querySelectorAll('.dot');
+
+function goTo(n){
+  if(n===current||n<0||n>=total)return;
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current=n;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  document.getElementById('slideNum').textContent=String(current+1).padStart(2,'0')+' — '+String(total).padStart(2,'0');
+  document.getElementById('progress').style.width=((current+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').disabled=current===total-1;
+}
+document.getElementById('nextBtn').onclick=()=>goTo(current+1);
+document.getElementById('prevBtn').onclick=()=>goTo(current-1);
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key))goTo(Math.min(current+1,total-1));
+  if(['ArrowLeft','PageUp'].includes(e.key))goTo(Math.max(current-1,0));
+  if(e.key==='Home')goTo(0); if(e.key==='End')goTo(total-1);
+});
+let wheelLock=false;
+window.addEventListener('wheel',e=>{
+  if(wheelLock)return;
+  if(Math.abs(e.deltaY)<25)return;
+  wheelLock=true;setTimeout(()=>wheelLock=false,900);
+  goTo(current+(e.deltaY>0?1:-1));
+},{passive:true});
+
+function makeMotes(id,n){
+  const c=document.getElementById(id);if(!c)return;
+  for(let i=0;i<n;i++){
+    const b=document.createElement('div');b.className='mote';
+    const s=2+Math.random()*7;
+    b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${-s}px;animation-duration:${10+Math.random()*12}s;animation-delay:${Math.random()*10}s;opacity:0`;
+    c.appendChild(b);
+  }
+}
+if(location.hash){const m=location.hash.match(/s=(\d+)/);if(m)goTo(Math.max(0,Math.min(parseInt(m[1])-1,total-1)))}
+for(let i=1;i<=14;i++) makeMotes('d'+i, (i===1||i===14)?28:16);
+</script>
+</body>
+</html>

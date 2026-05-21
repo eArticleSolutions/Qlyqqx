@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symbia · Mushroom — The Memory of Your Mycelium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Mushroom / Substrate palette */
+  --cream:#E8DCC4; --cream-bright:#F2EAD8; --moss:#6B8E4E;
+  --cap:#C8553D; --amber:#D9A441;
+  --substrate:#1A1410; --peat:#2B1F17; --bark:#3A2A1E;
+  --muted:#5C4A38; --text:#F2EAD8; --dim:#8B7A66;
+  --danger:#C8553D;
+  --ease:cubic-bezier(.7,.05,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--substrate);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* Spore-dust overlay + vignette */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:200;mix-blend-mode:overlay;opacity:.10;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.91 0 0 0 0 0.86 0 0 0 0 0.77 0 0 0 0.55 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:150;
+  background:radial-gradient(ellipse at center, transparent 45%, rgba(8,5,3,.78) 100%);
+}
+
+.deck{position:relative;width:100vw;height:100vh;background:var(--substrate)}
+.slide{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;overflow:hidden;
+  transition:opacity .9s var(--ease);
+  padding:5rem 2rem 6rem;
+}
+.slide > *:not(.slide-bg):not(.mesh):not(.spores){position:relative;z-index:5}
+.slide.active{opacity:1;pointer-events:all}
+
+.slide-bg{
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  transform:scale(1.08);
+  animation:kenburns 24s var(--ease) infinite alternate;
+}
+.slide-bg::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at center, rgba(26,20,16,.45) 0%, rgba(26,20,16,.85) 70%, rgba(26,20,16,.97) 100%);
+}
+@keyframes kenburns{
+  0%{transform:scale(1.08) translate(0,0)}
+  100%{transform:scale(1.14) translate(-1.5%,1%)}
+}
+
+#s1  .slide-bg{background-image:url("img/bg-hero.jpg")}
+#s2  .slide-bg{background-image:url("img/bg-mycelium.jpg")}
+#s3  .slide-bg{background-image:url("img/bg-contam.jpg")}
+#s4  .slide-bg{background-image:url("img/bg-flush.jpg")}
+#s5  .slide-bg{background-image:url("img/bg-spores.jpg")}
+#s6  .slide-bg{background-image:url("img/bg-tent.jpg")}
+#s7  .slide-bg{background-image:url("img/bg-mycelium.jpg")}
+#s8  .slide-bg{background-image:url("img/bg-substrate.jpg")}
+#s9  .slide-bg{background-image:url("img/bg-contam.jpg")}
+#s10 .slide-bg{background-image:url("img/bg-cluster.jpg")}
+#s11 .slide-bg{background-image:url("img/bg-flush.jpg")}
+#s12 .slide-bg{background-image:url("img/bg-tent.jpg")}
+#s13 .slide-bg{background-image:url("img/bg-spores.jpg")}
+#s14 .slide-bg{background-image:url("img/bg-hero.jpg")}
+
+#s1  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(26,20,16,.55) 0%, rgba(26,20,16,.9) 70%, rgba(26,20,16,.97) 100%)}
+#s2  .slide-bg::after{background:linear-gradient(90deg, rgba(26,20,16,.95) 30%, rgba(26,20,16,.55) 100%)}
+#s3  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(40,30,18,.55) 0%, rgba(26,20,16,.95) 80%)}
+#s4  .slide-bg::after{background:linear-gradient(180deg, rgba(26,20,16,.6) 0%, rgba(26,20,16,.94) 100%)}
+#s5  .slide-bg::after{background:radial-gradient(ellipse at 70% 50%, rgba(26,20,16,.6) 0%, rgba(26,20,16,.94) 70%)}
+#s6  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(26,20,16,.55) 0%, rgba(26,20,16,.93) 75%)}
+#s7  .slide-bg::after{background:linear-gradient(90deg, rgba(26,20,16,.55) 0%, rgba(26,20,16,.94) 65%)}
+#s8  .slide-bg::after{background:linear-gradient(90deg, rgba(26,20,16,.94) 35%, rgba(26,20,16,.55) 100%)}
+#s9  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(80,30,18,.45) 0%, rgba(26,20,16,.95) 75%)}
+#s10 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(26,20,16,.65) 0%, rgba(26,20,16,.94) 80%)}
+#s11 .slide-bg::after{background:linear-gradient(90deg, rgba(26,20,16,.55) 0%, rgba(26,20,16,.93) 65%)}
+#s12 .slide-bg::after{background:linear-gradient(90deg, rgba(26,20,16,.94) 35%, rgba(26,20,16,.6) 100%)}
+#s13 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(26,20,16,.55) 0%, rgba(26,20,16,.92) 80%)}
+#s14 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(26,20,16,.5) 0%, rgba(26,20,16,.9) 70%, rgba(26,20,16,.97) 100%)}
+
+.mesh{
+  position:absolute;inset:-10%;z-index:1;
+  background:
+    radial-gradient(at 20% 30%, rgba(232,220,196,.10), transparent 55%),
+    radial-gradient(at 80% 70%, rgba(139,111,71,.14), transparent 60%);
+  filter:blur(60px);mix-blend-mode:screen;
+  animation:meshShift 18s var(--ease) infinite alternate;
+  pointer-events:none;
+}
+@keyframes meshShift{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(2%,-3%) scale(1.05)}
+  100%{transform:translate(-3%,2%) scale(1.08)}
+}
+
+/* Spore dust — falling slowly, replaces bubbles */
+.spores{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.spore{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(242,234,216,.55), rgba(232,220,196,.05) 70%);
+  animation:fall linear infinite;
+  filter:blur(.3px);
+}
+@keyframes fall{
+  0%{transform:translateY(-10vh) translateX(0);opacity:0}
+  10%{opacity:.7}
+  90%{opacity:.4}
+  100%{transform:translateY(110vh) translateX(40px);opacity:0}
+}
+
+/* Reveal helpers */
+.reveal-mask{display:inline-block;overflow:hidden;vertical-align:bottom}
+.reveal-mask > span{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease-out)}
+.slide.active .reveal-mask > span{transform:translateY(0)}
+.slide.active .reveal-mask:nth-child(2) > span{transition-delay:.1s}
+.slide.active .reveal-mask:nth-child(3) > span{transition-delay:.2s}
+.slide.active .reveal-mask:nth-child(4) > span{transition-delay:.3s}
+
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .9s var(--ease-out), transform .9s var(--ease-out)}
+.slide.active .fade-up{opacity:1;transform:translateY(0)}
+.slide.active .fade-up.d1{transition-delay:.4s}
+.slide.active .fade-up.d2{transition-delay:.6s}
+.slide.active .fade-up.d3{transition-delay:.8s}
+.slide.active .fade-up.d4{transition-delay:1.0s}
+.slide.active .fade-up.d5{transition-delay:1.2s}
+.slide.active .fade-up.d6{transition-delay:1.4s}
+
+/* Typography */
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.4em;color:var(--cream);text-transform:uppercase;display:inline-flex;align-items:center;gap:.8rem}
+.eyebrow::before{content:"";width:36px;height:1px;background:var(--cream)}
+h1.headline,h2.headline{font-family:'Fraunces',serif;font-weight:300;line-height:.98;letter-spacing:-.035em;color:var(--text)}
+h1.headline em,h2.headline em{font-style:italic;color:var(--cream-bright);font-weight:400}
+h1.headline{font-size:clamp(2.6rem,6.4vw,5.8rem)}
+h2.headline{font-size:clamp(2.1rem,4.8vw,4rem)}
+.lede{font-size:1.05rem;line-height:1.75;color:var(--text);font-weight:300;max-width:560px}
+.lede b{color:var(--cream-bright);font-weight:500}
+
+/* Hook */
+.hook{
+  margin-top:2rem;display:flex;align-items:baseline;gap:.9rem;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+  font-size:clamp(1.15rem,1.7vw,1.5rem);color:var(--cream-bright);
+}
+.hook::before{
+  content:"↳";font-family:'JetBrains Mono',monospace;font-style:normal;
+  color:var(--cream);font-size:1.3rem;opacity:.85;
+}
+.hook em{color:var(--text);font-weight:500;text-decoration:underline;text-decoration-color:rgba(232,220,196,.55);text-underline-offset:6px;text-decoration-thickness:1px}
+
+/* Brand chrome */
+.brand{position:fixed;top:1.4rem;left:1.6rem;display:flex;align-items:center;gap:.7rem;z-index:300;text-decoration:none}
+.brand img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(232,220,196,.45))}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-text .nm{font-family:'Fraunces',serif;font-style:italic;font-size:.95rem;color:var(--cream);letter-spacing:.04em}
+.brand-text .by{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;margin-top:2px}
+.slide-num{position:fixed;top:1.8rem;right:2.2rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--dim);z-index:300}
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--cream),var(--cream-bright));z-index:301;transition:width .8s var(--ease);box-shadow:0 0 14px rgba(232,220,196,.6);width:7.14%}
+
+/* Nav */
+.nav{position:fixed;left:1.5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:1rem;z-index:300;background:rgba(26,20,16,.55);backdrop-filter:blur(12px);padding:1.2rem .5rem;border:1px solid rgba(232,220,196,.18);border-radius:50px}
+.nav-btn{width:28px;height:28px;border:none;background:transparent;color:var(--cream);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;border-radius:50%;transition:background .2s}
+.nav-btn:hover{background:rgba(232,220,196,.18)}
+.nav-btn:disabled{opacity:.25;cursor:not-allowed}
+.dots{display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:all .4s var(--ease);cursor:pointer}
+.dot.active{background:var(--cream);height:18px;border-radius:3px;box-shadow:0 0 10px rgba(232,220,196,.6)}
+
+/* SLIDE 1 — HERO */
+#s1{flex-direction:column;text-align:center;gap:2rem}
+#s1 .hero-logo{
+  width:min(220px,22vw);max-height:20vh;object-fit:contain;
+  filter:drop-shadow(0 10px 40px rgba(232,220,196,.45));
+  opacity:0;transform:translateY(20px) scale(.95);
+  transition:opacity 1.2s var(--ease-out), transform 1.4s var(--ease-out);
+}
+.slide.active#s1 .hero-logo{opacity:1;transform:translateY(0) scale(1)}
+#s1 h1{max-width:1100px}
+#s1 .lede{margin:0 auto;text-align:center;max-width:680px}
+#s1 .eyebrow{justify-content:center}
+
+/* SLIDE 2 — RACE GRAPH */
+#s2 .wrap{position:relative;z-index:5;width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:5rem;align-items:center}
+.drift-card{
+  position:relative;padding:1.8rem;
+  background:linear-gradient(180deg,rgba(43,31,23,.85),rgba(26,20,16,.92));
+  border:1px solid rgba(232,220,196,.22);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px rgba(232,220,196,.06);
+  backdrop-filter:blur(8px);
+}
+.drift-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--cream);text-transform:uppercase;margin-bottom:.6rem}
+.drift-card .title{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--text);font-weight:300;margin-bottom:1.2rem}
+.drift-svg{width:100%;height:200px;display:block}
+.drift-axis{stroke:rgba(232,220,196,.18);stroke-width:1;stroke-dasharray:2 4}
+.drift-line{fill:none;stroke:var(--cream);stroke-width:2.4;filter:drop-shadow(0 0 6px rgba(232,220,196,.45));stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset 2s var(--ease-out) .8s}
+.drift-line.contam{stroke:var(--cap);filter:drop-shadow(0 0 6px rgba(200,85,61,.55));transition-delay:1.4s}
+.slide.active .drift-line{stroke-dashoffset:0}
+.drift-band{fill:rgba(107,142,78,.08)}
+.drift-pt{fill:var(--cap);filter:drop-shadow(0 0 6px rgba(200,85,61,.7))}
+.drift-stats{display:flex;gap:1.4rem;margin-top:1rem;padding-top:1rem;border-top:1px dashed rgba(232,220,196,.18)}
+.drift-stats div{flex:1}
+.drift-stats .k{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.25em;color:var(--dim);text-transform:uppercase}
+.drift-stats .v{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--text);font-weight:300;margin-top:.2rem}
+.drift-stats .v.warn{color:var(--cap)}
+.drift-stats .v.ok{color:var(--moss)}
+
+/* SLIDE 3 — CRASH STATS (Green Tub) */
+#s3 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.6rem;text-align:center}
+.crash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;width:100%;max-width:980px}
+.crash-stat{
+  padding:2rem 1.6rem;border:1px solid rgba(200,85,61,.28);
+  background:linear-gradient(180deg,rgba(60,20,12,.45),rgba(26,20,16,.88));
+  border-radius:6px;text-align:left;backdrop-filter:blur(6px);
+  box-shadow:0 30px 60px rgba(0,0,0,.4),inset 0 0 0 1px rgba(200,85,61,.08);
+}
+.crash-stat .big{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--cap);font-weight:300;line-height:1;letter-spacing:-.02em}
+.crash-stat .l{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;margin-top:.8rem}
+.crash-stat .d{font-size:.95rem;color:var(--text);font-weight:300;margin-top:.5rem;line-height:1.5}
+
+/* SLIDE 4 — FLUSH COMPARISON (icp-card style) */
+#s4 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:4rem;align-items:center}
+.icp-card{
+  padding:1.8rem;background:linear-gradient(180deg,rgba(43,31,23,.85),rgba(26,20,16,.92));
+  border:1px solid rgba(232,220,196,.22);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);backdrop-filter:blur(8px);
+}
+.icp-row{display:flex;align-items:center;justify-content:space-between;padding:.95rem 0;border-bottom:1px dashed rgba(232,220,196,.16);gap:1rem}
+.icp-row:last-child{border-bottom:none}
+.icp-row .el{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.18em;color:var(--text);text-transform:uppercase;display:flex;align-items:center;gap:.7rem}
+.icp-row .el .sym{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:6px;background:rgba(232,220,196,.08);border:1px solid rgba(232,220,196,.28);font-family:'Fraunces',serif;font-size:.95rem;color:var(--cream-bright)}
+.icp-row .val{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--text);font-weight:300}
+.icp-row .stat{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;padding:.3rem .6rem;border-radius:50px;border:1px solid currentColor}
+.icp-row.ok .stat{color:var(--moss)}
+.icp-row.warn .stat{color:var(--amber)}
+.icp-row.bad .stat{color:var(--cap)}
+
+/* SLIDE 5 — SOURCE CARDS (Pattern Problem) */
+#s5 .wrap{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:2.4rem;align-items:flex-start}
+#s5 .head-row{display:flex;flex-direction:column;gap:1rem;max-width:780px}
+.source-rail{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;width:100%}
+.source-card{
+  position:relative;padding:1.6rem 1.5rem;border:1px solid rgba(232,220,196,.16);
+  background:linear-gradient(180deg,rgba(43,31,23,.85),rgba(26,20,16,.85));
+  border-radius:5px;display:flex;flex-direction:column;gap:.6rem;
+  backdrop-filter:blur(6px);
+}
+.source-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase}
+.source-card .name{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--text);font-weight:300;letter-spacing:-.01em}
+.source-card .desc{font-size:.88rem;color:var(--dim);font-weight:300;line-height:1.55}
+.source-card .pill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cap);padding-top:.6rem;margin-top:.3rem;border-top:1px dashed rgba(200,85,61,.3)}
+
+/* SLIDE 6 — VIDEO */
+#s6 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;gap:1.6rem;align-items:center;text-align:center}
+.video-frame{
+  position:relative;width:100%;max-width:760px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;
+  border:1px solid rgba(232,220,196,.28);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(232,220,196,.12);
+  background:#000;
+}
+.video-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.video-frame .placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  background:radial-gradient(circle at center, rgba(43,31,23,1), rgba(26,20,16,1) 80%);
+}
+.play{
+  width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cream-bright),var(--cream));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(232,220,196,.5);cursor:pointer;
+  transition:transform .3s var(--ease-out);
+}
+.play:hover{transform:scale(1.08)}
+.play::before{
+  content:"";width:0;height:0;margin-left:6px;
+  border-left:24px solid var(--substrate);
+  border-top:14px solid transparent;border-bottom:14px solid transparent;
+}
+.video-frame .cap{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--dim);text-transform:uppercase}
+.video-frame .corners::before,.video-frame .corners::after{content:"";position:absolute;width:24px;height:24px;border:1px solid var(--cream)}
+.video-frame .corners::before{top:14px;left:14px;border-right:none;border-bottom:none}
+.video-frame .corners::after{bottom:14px;right:14px;border-left:none;border-top:none}
+
+/* SLIDE 7 — CHAT */
+#s7 .wrap{width:100%;max-width:980px;display:flex;flex-direction:column;gap:1.6rem}
+.chat{
+  background:linear-gradient(180deg,rgba(43,31,23,.92),rgba(26,20,16,.94));
+  border:1px solid rgba(232,220,196,.22);border-radius:8px;
+  padding:1.8rem;display:flex;flex-direction:column;gap:1.1rem;
+  backdrop-filter:blur(8px);box-shadow:0 30px 80px rgba(0,0,0,.55);
+}
+.chat-row{display:flex;gap:1rem;align-items:flex-start}
+.chat-row .who{
+  flex:none;width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;
+}
+.chat-row.user .who{background:rgba(232,220,196,.12);color:var(--cream-bright);border:1px solid rgba(232,220,196,.4)}
+.chat-row.ai .who{background:rgba(107,142,78,.14);color:var(--moss);border:1px solid rgba(107,142,78,.5);overflow:hidden;padding:0}
+.chat-row.ai .who img{width:100%;height:100%;object-fit:contain;padding:4px}
+.bubble-msg{
+  flex:1;padding:1rem 1.2rem;border-radius:6px;font-size:1rem;line-height:1.6;
+  background:rgba(255,255,255,.02);border:1px solid rgba(232,220,196,.10);
+}
+.bubble-msg.q{font-family:'Fraunces',serif;font-style:italic;color:var(--text);font-size:1.1rem}
+.bubble-msg .meta{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;
+  letter-spacing:.25em;color:var(--dim);margin-bottom:.5rem;text-transform:uppercase;
+}
+.bubble-msg b{color:var(--cream-bright);font-weight:500}
+.bubble-msg .flag{color:var(--amber);font-weight:500}
+
+/* SLIDE 8 — BLUEPRINT */
+#s8 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.1fr;gap:4rem;align-items:center}
+.blueprint{
+  position:relative;padding:2rem;
+  background:linear-gradient(180deg,rgba(43,31,23,.7),rgba(26,20,16,.92));
+  border:1px solid rgba(232,220,196,.26);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px rgba(232,220,196,.05);
+}
+.blueprint::before{
+  content:"NEXT GROW · DESIGNED";
+  position:absolute;top:-10px;left:1.5rem;background:var(--substrate);
+  padding:0 .8rem;font-family:'JetBrains Mono',monospace;
+  font-size:.55rem;letter-spacing:.3em;color:var(--cream);
+}
+.spec-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.05rem 0;border-bottom:1px dashed rgba(232,220,196,.16);gap:1rem;
+}
+.spec-row:last-child{border-bottom:none}
+.spec-row .k{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.spec-row .v{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--text);font-weight:300;text-align:right}
+.spec-row .v small{display:block;font-family:'Inter',sans-serif;font-size:.62rem;color:var(--moss);letter-spacing:.15em;text-transform:uppercase;margin-top:.25rem;font-weight:500}
+
+/* SLIDE 9 — ALERT (Contamination Guard) */
+#s9 .wrap{width:100%;max-width:1080px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem}
+.alert-card{
+  width:100%;max-width:820px;padding:2.2rem 2.4rem;
+  background:linear-gradient(135deg,rgba(200,85,61,.14),rgba(43,31,23,.92));
+  border:1px solid rgba(200,85,61,.5);border-radius:6px;
+  position:relative;overflow:hidden;text-align:left;
+  box-shadow:0 30px 80px rgba(200,85,61,.18),inset 0 0 0 1px rgba(200,85,61,.08);
+}
+.alert-card::before{
+  content:"⚠";position:absolute;top:1rem;right:1.5rem;font-size:2.2rem;
+  color:var(--cap);opacity:.7;
+}
+.alert-card .tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--cap);text-transform:uppercase;margin-bottom:1rem}
+.alert-card .observed{font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;color:var(--text);margin-bottom:1.5rem;line-height:1.4}
+.alert-card .verdict{
+  display:flex;gap:1.2rem;align-items:flex-start;padding-top:1.4rem;
+  border-top:1px solid rgba(200,85,61,.28);
+}
+.alert-card .verdict .label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;color:var(--dim);text-transform:uppercase;flex:none;min-width:90px;padding-top:.3rem}
+.alert-card .verdict .body{font-family:'Fraunces',serif;font-size:1.22rem;color:var(--cream-bright);line-height:1.5}
+.alert-card .verdict .body b{color:#F2D6CC;font-weight:500}
+
+/* SLIDE 10 — PRICING */
+#s10 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.6rem;text-align:center}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;width:100%;max-width:980px;text-align:left}
+.price{
+  position:relative;padding:2.2rem;border:1px solid rgba(232,220,196,.22);
+  background:linear-gradient(180deg,rgba(43,31,23,.88),rgba(26,20,16,.92));
+  border-radius:6px;backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;gap:1rem;
+  transition:transform .5s var(--ease-out),border-color .5s;
+}
+.price:hover{transform:translateY(-4px);border-color:rgba(232,220,196,.55)}
+.price.featured{border-color:rgba(232,220,196,.55);box-shadow:0 0 60px rgba(232,220,196,.15)}
+.price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--cream);text-transform:uppercase}
+.price h3{font-family:'Fraunces',serif;font-weight:300;font-size:2rem;color:var(--text);letter-spacing:-.02em}
+.price .amount{display:flex;align-items:baseline;gap:.4rem;margin-top:.2rem}
+.price .amount .big{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--cream-bright);font-weight:400;line-height:1}
+.price .amount .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--dim);text-transform:uppercase}
+.price p{font-size:.95rem;line-height:1.6;color:var(--text);font-weight:300}
+
+/* SLIDE 11 — REFERRALS */
+#s11 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1.05fr 1fr;gap:4.5rem;align-items:center}
+.ref-vis{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.ref-center{
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--cream-bright),var(--cream));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;color:var(--substrate);font-size:1.4rem;font-weight:600;
+  box-shadow:0 0 60px rgba(232,220,196,.55);z-index:3;
+}
+.ref-orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(232,220,196,.28);animation:spin 80s linear infinite}
+.ref-orbit.outer{inset:-8%;animation-duration:120s;animation-direction:reverse;border-color:rgba(232,220,196,.14)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ref-node{
+  position:absolute;width:62px;height:62px;border-radius:50%;
+  background:rgba(43,31,23,.92);border:1px solid rgba(232,220,196,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--cream-bright);
+  letter-spacing:.1em;backdrop-filter:blur(4px);
+}
+.ref-node.n1{top:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n2{top:50%;right:5%;transform:translateY(-50%)}
+.ref-node.n3{bottom:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n4{top:50%;left:5%;transform:translateY(-50%)}
+.ref-roi{
+  position:absolute;bottom:-2rem;left:50%;transform:translateX(-50%);
+  font-family:'Fraunces',serif;font-style:italic;color:var(--moss);
+  font-size:1.3rem;white-space:nowrap;
+}
+.metric-row{display:flex;flex-direction:column;gap:.9rem;margin-top:1.5rem}
+.metric{display:flex;align-items:baseline;gap:1rem;padding:1rem 1.2rem;background:rgba(43,31,23,.55);border:1px solid rgba(232,220,196,.16);border-radius:5px}
+.metric .num{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--cream-bright);font-weight:400;min-width:90px}
+.metric .desc{font-size:.95rem;color:var(--text);font-weight:300}
+
+/* SLIDE 12 — DFY */
+#s12 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.dfy-steps{display:flex;flex-direction:column;gap:.9rem;margin-top:1.6rem}
+.dfy-step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.1rem;background:rgba(43,31,23,.55);border:1px solid rgba(232,220,196,.16);border-radius:5px}
+.dfy-step .n{flex:none;width:30px;height:30px;border-radius:50%;background:rgba(232,220,196,.12);border:1px solid rgba(232,220,196,.4);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--cream-bright)}
+.dfy-step .t{font-size:.95rem;color:var(--text);font-weight:300;line-height:1.5}
+.dfy-step .t b{color:var(--cream-bright);font-weight:500}
+.dfy-price{
+  padding:2.4rem;border:1px solid rgba(232,220,196,.55);border-radius:8px;
+  background:linear-gradient(180deg,rgba(43,31,23,.9),rgba(26,20,16,.95));
+  box-shadow:0 0 80px rgba(232,220,196,.15);text-align:center;
+}
+.dfy-price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--cream);text-transform:uppercase}
+.dfy-price h3{font-family:'Fraunces',serif;font-weight:300;font-size:2rem;color:var(--text);margin-top:.5rem}
+.dfy-price .big{font-family:'Fraunces',serif;font-size:4rem;color:var(--cream-bright);font-weight:400;line-height:1;margin-top:1rem}
+.dfy-price .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-top:.3rem}
+.dfy-price .note{font-size:.85rem;color:var(--dim);font-weight:300;margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(232,220,196,.18);line-height:1.55}
+.dfy-price .note b{color:var(--text)}
+
+/* SLIDE 13 — COMMUNITY */
+#s13 .wrap{width:100%;max-width:1240px;display:flex;flex-direction:column;gap:2.4rem}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.feat{
+  padding:1.4rem 1.4rem 1.5rem;background:linear-gradient(180deg,rgba(43,31,23,.7),rgba(26,20,16,.85));
+  border:1px solid rgba(232,220,196,.16);border-radius:5px;
+  display:flex;flex-direction:column;gap:.5rem;
+  transition:border-color .4s,transform .4s;
+}
+.feat:hover{border-color:rgba(232,220,196,.45);transform:translateY(-2px)}
+.feat .icon{
+  width:36px;height:36px;border-radius:50%;background:rgba(232,220,196,.10);
+  border:1px solid rgba(232,220,196,.4);display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-style:italic;color:var(--cream-bright);font-size:1.1rem;margin-bottom:.5rem;
+}
+.feat h4{font-family:'Fraunces',serif;font-weight:400;font-size:1.1rem;color:var(--text);letter-spacing:-.01em}
+.feat p{font-size:.85rem;line-height:1.55;color:var(--dim);font-weight:300}
+
+/* SLIDE 14 — FINAL CTA */
+#s14{flex-direction:column;text-align:center;gap:2rem}
+#s14 .ring{
+  position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(232,220,196,.20);
+  transform:translate(-50%,-50%);pointer-events:none;animation:pulse 6s var(--ease) infinite;
+}
+#s14 .ring:nth-child(1){width:520px;height:520px}
+#s14 .ring:nth-child(2){width:760px;height:760px;animation-delay:1.5s;border-color:rgba(232,220,196,.12)}
+#s14 .ring:nth-child(3){width:1000px;height:1000px;animation-delay:3s;border-color:rgba(232,220,196,.06)}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+#s14 .emblem{width:110px;height:auto;filter:drop-shadow(0 8px 40px rgba(232,220,196,.55));z-index:5;position:relative}
+#s14 h2{position:relative;z-index:5;max-width:1000px}
+#s14 .cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:5}
+.cta{
+  display:inline-flex;align-items:center;gap:.7rem;
+  padding:1.1rem 1.9rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.3em;
+  text-transform:uppercase;text-decoration:none;border-radius:50px;
+  border:1px solid rgba(232,220,196,.45);color:var(--text);
+  transition:all .35s var(--ease-out);background:rgba(26,20,16,.55);backdrop-filter:blur(8px);
+}
+.cta:hover{transform:translateY(-2px);border-color:var(--cream-bright);box-shadow:0 12px 30px rgba(232,220,196,.3)}
+.cta.primary{
+  background:linear-gradient(135deg,var(--cap),#A8412E);color:var(--cream-bright);border-color:transparent;
+  font-weight:500;box-shadow:0 12px 40px rgba(200,85,61,.45);
+}
+.cta.primary:hover{box-shadow:0 18px 60px rgba(200,85,61,.65);color:#fff}
+.cta .arr{transition:transform .3s}
+.cta:hover .arr{transform:translateX(4px)}
+#s14 .closer{font-family:'Fraunces',serif;font-style:italic;font-size:1.15rem;color:var(--dim);position:relative;z-index:5}
+
+/* Hint */
+.scroll-hint{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--dim);text-transform:uppercase;z-index:300;opacity:.7}
+
+/* Responsive */
+@media(max-width:900px){
+  .slide{padding:5rem 1.2rem 6rem}
+  #s2 .wrap,#s4 .wrap,#s8 .wrap,#s11 .wrap,#s12 .wrap{grid-template-columns:1fr;gap:2.5rem}
+  .source-rail,.crash-stats,.feat-grid,.price-grid{grid-template-columns:1fr}
+  h1.headline{font-size:2.4rem}
+  h2.headline{font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<a class="brand" href="#">
+  <img src="img/symbia-emblem.png" alt="Symbia">
+  <span class="brand-text">
+    <span class="nm">Symbia</span>
+    <span class="by">Mushroom · By Qlyqqx</span>
+  </span>
+</a>
+<div class="slide-num" id="slideNum">01 — 14</div>
+<div class="progress" id="progress"></div>
+
+<div class="deck">
+
+<!-- ───── SLIDE 1: HERO ───── -->
+<div class="slide active" id="s1">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp1"></div>
+  <img class="hero-logo" src="img/symbia-logo.png" alt="Symbia — Memory of Your Mycelium">
+  <div class="eyebrow fade-up d1">For Gourmet &amp; Home Cultivators</div>
+  <h1 class="headline">
+    <span class="reveal-mask"><span>Your mycelium already knows</span></span><br>
+    <span class="reveal-mask"><span>how to <em>never contaminate again.</em></span></span>
+  </h1>
+  <p class="lede fade-up d3">It's been tracking the answer since your first inoculation. Temperature. Moisture. FAE timing. Grain-to-bulk ratio. <b>It knows. It just can't tell you.</b></p>
+  <div class="hook fade-up d4">What if it <em>could?</em></div>
+</div>
+
+<!-- ───── SLIDE 2: THE INVISIBLE RACE ───── -->
+<div class="slide" id="s2">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp2"></div>
+  <div class="wrap">
+    <div class="drift-card fade-up">
+      <div class="label">Colonization · Day 1 → Day 14</div>
+      <div class="title">The race no one's watching</div>
+      <svg class="drift-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
+        <line class="drift-axis" x1="0" y1="60" x2="600" y2="60"/>
+        <line class="drift-axis" x1="0" y1="100" x2="600" y2="100"/>
+        <line class="drift-axis" x1="0" y1="140" x2="600" y2="140"/>
+        <rect class="drift-band" x="0" y="40" width="600" height="60"/>
+        <path class="drift-line" d="M0,170 C80,160 140,140 220,115 C300,90 360,75 440,62 C500,55 560,50 600,48"/>
+        <path class="drift-line contam" d="M0,180 C100,178 200,172 300,160 C380,150 450,140 520,125 C560,118 590,112 600,108"/>
+        <circle class="drift-pt" cx="540" cy="120" r="5"/>
+      </svg>
+      <div class="drift-stats">
+        <div><div class="k">Mycelium</div><div class="v ok">winning</div></div>
+        <div><div class="k">Trichoderma</div><div class="v warn">creeping</div></div>
+        <div><div class="k">You see it</div><div class="v warn">Day 19</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow fade-up">Colonization · The Silent Race</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>The clock starts</span></span><br>
+        <span class="reveal-mask"><span>at <em>inoculation.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Trich doesn't announce itself — it creeps in at the edge where moisture settled wrong. By the time you see green, the battle's been over for <b>days.</b> You lost that tub almost a week ago and didn't know.</p>
+      <div class="hook fade-up d4">What if you could see <em>who was winning?</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 3: THE GREEN TUB ───── -->
+<div class="slide" id="s3">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp3"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Contamination · The Gut Punch</div>
+    <h2 class="headline fade-up d1">
+      You know exactly what opening a <em>green tub</em> feels like.
+    </h2>
+    <p class="lede fade-up d2" style="text-align:center;margin:0 auto">Two weeks of spawn run. A pressure-cook session that kept you up till 11pm. Trichoderma edge to edge. Everything gone.</p>
+    <div class="crash-stats">
+      <div class="crash-stat fade-up d3">
+        <div class="big">20–40%</div>
+        <div class="l">Home contam rate · per cycle</div>
+        <div class="d">Industry baseline for home cultivators. Most growers don't even track theirs.</div>
+      </div>
+      <div class="crash-stat fade-up d4">
+        <div class="big">6 days</div>
+        <div class="l">From edge → green tub</div>
+        <div class="d">The window between the first moisture deviation and visible takeover.</div>
+      </div>
+      <div class="crash-stat fade-up d5">
+        <div class="big">$0</div>
+        <div class="l">Answers · per crashed tub</div>
+        <div class="d">Moisture, FAE, contaminated grain? You'll make the same guess on the next one.</div>
+      </div>
+    </div>
+    <div class="hook fade-up d6">What if the tub had been <em>telling you</em> six days ago?</div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 4: FLUSH MYSTERY ───── -->
+<div class="slide" id="s4">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp4"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">First Flush Perfect · Second Flush ???</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Your first flush</span></span><br>
+        <span class="reveal-mask"><span>was <em>incredible.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">347g from a single monotub. Dense pins. Perfect veil timing. Then flush two: <b>110g of aborts and wispy underdeveloped pins.</b> You changed three things between flushes — no baseline, no answer, same guess on the next run.</p>
+      <div class="hook fade-up d4">What if one brain <em>remembered every variable?</em></div>
+    </div>
+    <div class="icp-card fade-up d3">
+      <div class="icp-row ok">
+        <span class="el"><span class="sym">F1</span>Flush 1</span>
+        <span class="val">347 g</span>
+        <span class="stat">Dense · Veiled</span>
+      </div>
+      <div class="icp-row bad">
+        <span class="el"><span class="sym">F2</span>Flush 2</span>
+        <span class="val">110 g</span>
+        <span class="stat">Aborts · Wispy</span>
+      </div>
+      <div class="icp-row warn">
+        <span class="el"><span class="sym">Δ</span>Delta</span>
+        <span class="val">−68%</span>
+        <span class="stat">Unexplained</span>
+      </div>
+      <div class="icp-row warn">
+        <span class="el"><span class="sym">Hʟ</span>Dunk Temp</span>
+        <span class="val">14° → 18°C</span>
+        <span class="stat">Changed</span>
+      </div>
+      <div class="icp-row warn">
+        <span class="el"><span class="sym">Tᴀ</span>Ambient</span>
+        <span class="val">17° → 22°C</span>
+        <span class="stat">Changed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 5: PATTERN PROBLEM ───── -->
+<div class="slide" id="s5">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp5"></div>
+  <div class="wrap">
+    <div class="head-row">
+      <div class="eyebrow fade-up">Data Without Memory</div>
+      <h2 class="headline">
+        <span class="reveal-mask"><span>You have grow logs.</span></span><br>
+        <span class="reveal-mask"><span>They don't <em>talk to each other.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Nothing connects your January oyster run to your current monotub. Nobody saying: <b>your pinset is 14 hours faster when you dunk at 14°C vs 18°C.</b></p>
+    </div>
+    <div class="source-rail">
+      <div class="source-card fade-up d3">
+        <span class="label">Source · 01</span>
+        <span class="name">Notes app</span>
+        <span class="desc">Half-thoughts at 11pm. "Try Masters Mix again next time." Then never opened.</span>
+        <span class="pill">→ Disconnected</span>
+      </div>
+      <div class="source-card fade-up d4">
+        <span class="label">Source · 02</span>
+        <span class="name">Photo library</span>
+        <span class="desc">87 monotub shots. No tag, no date you trust, no comparison across cycles.</span>
+        <span class="pill">→ Disconnected</span>
+      </div>
+      <div class="source-card fade-up d5">
+        <span class="label">Source · 03</span>
+        <span class="name">Spreadsheet</span>
+        <span class="desc">The one you started in March. Last edited the day flush 2 disappointed you.</span>
+        <span class="pill">→ Abandoned</span>
+      </div>
+    </div>
+    <div class="hook fade-up d6" style="margin-top:.4rem">What if <em>one brain held all of it?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 6: SYMBIA LIVE ───── -->
+<div class="slide" id="s6">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp6"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Symbia · Live</div>
+    <h2 class="headline fade-up d1" style="margin-bottom:.3rem">
+      Meet the <em>memory</em> of your mycelium.
+    </h2>
+    <div class="video-frame fade-up d2">
+      <video controls poster="img/symbia-emblem.png">
+        <source src="video/symbia-live.mp4" type="video/mp4">
+      </video>
+      <div class="placeholder">
+        <div class="corners"></div>
+        <div class="play"></div>
+        <div class="cap">Symbia · Live Demo · 02:18</div>
+      </div>
+    </div>
+    <div class="hook fade-up d3">What does it actually <em>know</em> about your grows?</div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 7: PATTERNS DECODED ───── -->
+<div class="slide" id="s7">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp7"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Ask Anything</div>
+    <h2 class="headline fade-up d1">
+      Finally understand why <em>flush two</em> always disappoints.
+    </h2>
+    <div class="chat fade-up d2">
+      <div class="chat-row user">
+        <div class="who">YOU</div>
+        <div class="bubble-msg q">
+          <span class="meta">Cultivator · 23:14</span>
+          "My oyster tub's second flush is pinning slow and aborting. Parameters look fine."
+        </div>
+      </div>
+      <div class="chat-row ai">
+        <div class="who"><img src="img/symbia-emblem.png" alt=""></div>
+        <div class="bubble-msg">
+          <span class="meta">Symbia · pattern matched · 5 oyster cycles</span>
+          Second flushes underperform <b>above 21°C ambient</b> in your history. Flush 1 ran at 17°C — that's the delta.<br><br>Recommendation: <b>cold dunk 13–15°C, 14 hours, increase FAE, drop misting frequency.</b><br><br><span class="flag">Also flagging your rehydration window — 6 hours short of your best run.</span>
+        </div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What else <em>does it find?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 8: BLUEPRINT ───── -->
+<div class="slide" id="s8">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp8"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Next Grow · Designed</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>From guessing</span></span><br>
+        <span class="reveal-mask"><span>to a <em>recipe</em> that worked.</span></span>
+      </h2>
+      <p class="lede fade-up d2">Symbia doesn't just remember. It <b>composes.</b> The next substrate, the next dunk, the next FAE schedule — written by every reading from your best flush, tuned to the genetics in your tub right now.</p>
+      <div class="hook fade-up d4">What about catching contamination <em>before</em> it spreads?</div>
+    </div>
+    <div class="blueprint fade-up d3">
+      <div class="spec-row">
+        <span class="k">Substrate</span>
+        <span class="v">MM 65 / WB 35 <small>↗ field cap 62–65%</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Dunk</span>
+        <span class="v">13–15°C · 14 hrs <small>↗ pinset +14h faster</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">FAE</span>
+        <span class="v">5× daily <small>↗ aligned to flush 1</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Fruiting</span>
+        <span class="v">16–19°C <small>↗ your pinset data says so</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Predicted F1</span>
+        <span class="v">290–340 g <small>↗ within your strain band</small></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 9: CONTAMINATION GUARD ───── -->
+<div class="slide" id="s9">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp9"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Before The Green · Before The Loss</div>
+    <h2 class="headline fade-up d1">
+      Catch it the moment it's <em>off</em> — while you can still act.
+    </h2>
+    <p class="lede fade-up d2" style="text-align:center;margin:0 auto">Snap a photo. Describe what you see and smell. Symbia separates bruising from overlay from early contam — pattern-matched against your specific grow history, not the internet's.</p>
+    <div class="alert-card fade-up d3">
+      <div class="tag">⚠ Symbia · Risk Detected</div>
+      <div class="observed">"Yellow tinge at the substrate edge, faint sour smell over the last 24 hours."</div>
+      <div class="verdict">
+        <div class="label">Verdict</div>
+        <div class="body"><b>Bacterial wet rot — not trichoderma.</b> Contained zone, top-right quadrant. <b>Isolate now, drop FAE 30%, cut surface moisture for 48 hours.</b> Tub recoverable.</div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What about replicating your <em>best genetics?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 10: PRICING ───── -->
+<div class="slide" id="s10">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp10"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Yours · Forever</div>
+    <h2 class="headline fade-up d1">
+      Less than the cost of <em>two contaminated tubs.</em>
+    </h2>
+    <div class="price-grid">
+      <div class="price featured fade-up d2">
+        <span class="tag">One-time · Lifetime</span>
+        <h3>The Symbia Agent</h3>
+        <div class="amount"><span class="big">$97</span><span class="per">/ once</span></div>
+        <p>Your personal, self-learning grow brain. Yours forever — every variable, every flush, every photo. Memory + early-warning unlocked.</p>
+      </div>
+      <div class="price fade-up d3">
+        <span class="tag">Membership</span>
+        <h3>Mushroom Masters</h3>
+        <div class="amount"><span class="big">$19</span><span class="per">/ month</span></div>
+        <p>Live grow office hours, shared clone libraries, group substrate buys. The collective brain behind the agent.</p>
+      </div>
+    </div>
+    <div class="hook fade-up d4">But what if it <em>pays for itself?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 11: REFERRALS ───── -->
+<div class="slide" id="s11">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp11"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Build Your Circle · Earn</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Bring in the growers</span></span><br>
+        <span class="reveal-mask"><span>in your <em>life.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2"><b>30% recurring affiliate</b> — auto-enabled the day you join. No forms, no waiting.</p>
+      <div class="metric-row">
+        <div class="metric fade-up d3"><span class="num">30%</span><span class="desc">recurring · auto-enabled · day one</span></div>
+        <div class="metric fade-up d4"><span class="num">4</span><span class="desc">referrals = <b style="color:var(--moss)">120% ROI</b> — your sub pays you</span></div>
+      </div>
+      <div class="hook fade-up d5" style="margin-top:1.6rem">What if you don't want to <em>touch the tech?</em></div>
+    </div>
+    <div class="ref-vis fade-up d3">
+      <div class="ref-orbit outer"></div>
+      <div class="ref-orbit"></div>
+      <div class="ref-center">YOU</div>
+      <div class="ref-node n1">+30%</div>
+      <div class="ref-node n2">+30%</div>
+      <div class="ref-node n3">+30%</div>
+      <div class="ref-node n4">+30%</div>
+      <div class="ref-roi">= 120% ROI</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 12: DONE FOR YOU ───── -->
+<div class="slide" id="s12">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp12"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">White-Glove Setup</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>You focus on the fungi.</span></span><br>
+        <span class="reveal-mask"><span>We handle the <em>install.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">For the grower who just wants it working. <b>No terminals. No config files. No tech headaches.</b> Symbia is live the moment we walk out.</p>
+      <div class="dfy-steps">
+        <div class="dfy-step fade-up d3"><span class="n">1</span><span class="t">You spin up a <b>$4–6/mo VPS</b> (Contabo or Hostinger — your account, your cost).</span></div>
+        <div class="dfy-step fade-up d4"><span class="n">2</span><span class="t">Share credentials. We <b>install Symbia, configure your grow profile</b>, and walk out.</span></div>
+        <div class="dfy-step fade-up d5"><span class="n">3</span><span class="t">You log in. <b>Symbia is already learning your tubs.</b></span></div>
+      </div>
+    </div>
+    <div class="dfy-price fade-up d3">
+      <span class="tag">One-Time · Done-For-You</span>
+      <h3>White-Glove Install</h3>
+      <div class="big">$297</div>
+      <div class="per">/ one-time setup fee</div>
+      <div class="note">Hosting (~$4–6/mo) is yours. <b>Everything else is ours.</b> Symbia license sold separately.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 13: COLLECTIVE BRAIN ───── -->
+<div class="slide" id="s13">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp13"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Mushroom Masters · The Collective</div>
+    <h2 class="headline fade-up d1" style="max-width:980px">
+      Where gourmet growers <em>compare notes</em> at 2am.
+    </h2>
+    <div class="feat-grid">
+      <div class="feat fade-up d2"><div class="icon">⏱</div><h4>Live grow office hours</h4><p>Drop-ins where master growers crack open your tub data with you, in real time.</p></div>
+      <div class="feat fade-up d2"><div class="icon">🜂</div><h4>Contamination archive</h4><p>Photo-indexed, searchable by appearance and smell. Theirs becomes your early warning.</p></div>
+      <div class="feat fade-up d3"><div class="icon">⌬</div><h4>Shared clone libraries</h4><p>Trade tissue cuts, compare strain performance across 300+ active grows.</p></div>
+      <div class="feat fade-up d3"><div class="icon">↻</div><h4>Group substrate buys</h4><p>Bulk Masters Mix, rye grain, hardwood pellets — bulk pricing, shipped together.</p></div>
+      <div class="feat fade-up d4"><div class="icon">★</div><h4>Strain performance map</h4><p>Your genetics meet 300 other grows. Patterns no single grower could ever see.</p></div>
+      <div class="feat fade-up d4"><div class="icon">⇄</div><h4>One-to-one grow buddy</h4><p>Bench-to-bench help when something's off at 11pm. A real human in your time zone.</p></div>
+    </div>
+    <div class="hook fade-up d5" style="margin-top:.4rem">What happens when your strain data <em>meets 300 others?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 14: FINAL CTA ───── -->
+<div class="slide" id="s14">
+  <div class="slide-bg"></div>
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="mesh"></div>
+  <div class="spores" id="sp14"></div>
+  <img class="emblem fade-up" src="img/symbia-emblem.png" alt="Symbia">
+  <div class="eyebrow fade-up d1">The Green Tub Ends Here</div>
+  <h2 class="headline">
+    <span class="reveal-mask"><span>Every flush from now on</span></span><br>
+    <span class="reveal-mask"><span>remembers <em>the last.</em></span></span>
+  </h2>
+  <p class="lede fade-up d2" style="margin:0 auto;text-align:center">Substrate recipe, written from your best flush. Contamination, caught before it spreads. Genetics, mapped and repeatable.</p>
+  <div class="cta-row fade-up d3">
+    <a href="#" class="cta primary"><span>Get Symbia · $97</span> <span class="arr">→</span></a>
+    <a href="#" class="cta"><span>Join Mushroom Masters · $19/mo</span> <span class="arr">→</span></a>
+  </div>
+  <div class="closer fade-up d4">Symbia · The Memory of Your Mycelium</div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" disabled>←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn">→</button>
+</div>
+<div class="scroll-hint">Scroll · Arrows · Space</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('dots');
+const total=slides.length;
+let current=0;
+for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
+const dots=document.querySelectorAll('.dot');
+
+function goTo(n){
+  if(n===current||n<0||n>=total)return;
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current=n;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  document.getElementById('slideNum').textContent=String(current+1).padStart(2,'0')+' — '+String(total).padStart(2,'0');
+  document.getElementById('progress').style.width=((current+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').disabled=current===total-1;
+}
+document.getElementById('nextBtn').onclick=()=>goTo(current+1);
+document.getElementById('prevBtn').onclick=()=>goTo(current-1);
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key))goTo(Math.min(current+1,total-1));
+  if(['ArrowLeft','PageUp'].includes(e.key))goTo(Math.max(current-1,0));
+  if(e.key==='Home')goTo(0); if(e.key==='End')goTo(total-1);
+});
+let wheelLock=false;
+window.addEventListener('wheel',e=>{
+  if(wheelLock)return;
+  if(Math.abs(e.deltaY)<25)return;
+  wheelLock=true;setTimeout(()=>wheelLock=false,900);
+  goTo(current+(e.deltaY>0?1:-1));
+},{passive:true});
+
+function makeSpores(id,n){
+  const c=document.getElementById(id);if(!c)return;
+  for(let i=0;i<n;i++){
+    const b=document.createElement('div');b.className='spore';
+    const s=2+Math.random()*5;
+    b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${-s}px;animation-duration:${14+Math.random()*16}s;animation-delay:${Math.random()*12}s;opacity:0`;
+    c.appendChild(b);
+  }
+}
+if(location.hash){const m=location.hash.match(/s=(\d+)/);if(m)goTo(Math.max(0,Math.min(parseInt(m[1])-1,total-1)))}
+for(let i=1;i<=14;i++) makeSpores('sp'+i, (i===1||i===14)?40:22);
+</script>
+</body>
+</html>

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WISP Ocrat — The Memory of Your Classroom</title>
+<link rel="icon" type="image/png" href="img/wisp-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* WISP Ocrat palette — icy electric blue lamp on deep midnight navy */
+  --ink:#050D1A; --night:#0A1A2E; --deep:#102C4A;
+  --ice:#7DD3FC; --ice-deep:#0EA5E9; --ice-soft:#BAE6FD;
+  --glow:#38BDF8; --halo:#E0F2FE;
+  --pearl:#F0F9FF; --linen:#94A8C0; --dim:#5A7290;
+  --ease:cubic-bezier(.7,.05,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--pearl);-webkit-font-smoothing:antialiased}
+
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:200;mix-blend-mode:overlay;opacity:.08;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.49 0 0 0 0 0.83 0 0 0 0 0.99 0 0 0 0.55 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:150;
+  background:radial-gradient(ellipse at center, transparent 40%, rgba(2,6,14,.85) 100%);
+}
+
+.deck{position:relative;width:100vw;height:100vh;background:radial-gradient(ellipse at 50% 30%, var(--night) 0%, var(--ink) 70%)}
+.slide{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;overflow:hidden;
+  transition:opacity .9s var(--ease);
+  padding:5rem 2rem 6rem;
+}
+.slide > *:not(.mesh):not(.dust):not(.ring):not(.starfield){position:relative;z-index:5}
+.slide.active{opacity:1;pointer-events:all}
+
+/* Aurora mesh — icy blue glow */
+.mesh{
+  position:absolute;inset:-10%;z-index:1;
+  background:
+    radial-gradient(at 18% 28%, rgba(56,189,248,.28), transparent 55%),
+    radial-gradient(at 82% 72%, rgba(125,211,252,.20), transparent 60%),
+    radial-gradient(at 50% 90%, rgba(14,165,233,.16), transparent 55%);
+  filter:blur(70px);mix-blend-mode:screen;
+  animation:meshShift 22s var(--ease) infinite alternate;
+  pointer-events:none;
+}
+@keyframes meshShift{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(2%,-3%) scale(1.06)}
+  100%{transform:translate(-3%,2%) scale(1.1)}
+}
+
+/* Drifting motes (ice sparks) */
+.dust{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.mote{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(186,230,253,.9), rgba(56,189,248,.05) 70%);
+  filter:blur(.4px);
+  animation:drift linear infinite;
+}
+@keyframes drift{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:.85}
+  50%{transform:translateY(-50vh) translateX(15px);opacity:.6}
+  90%{opacity:.3}
+  100%{transform:translateY(-110vh) translateX(-25px);opacity:0}
+}
+
+.reveal-mask{display:inline-block;overflow:hidden;vertical-align:bottom}
+.reveal-mask > span{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease-out)}
+.slide.active .reveal-mask > span{transform:translateY(0)}
+.slide.active .reveal-mask:nth-child(2) > span{transition-delay:.1s}
+.slide.active .reveal-mask:nth-child(3) > span{transition-delay:.2s}
+.slide.active .reveal-mask:nth-child(4) > span{transition-delay:.3s}
+
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .9s var(--ease-out), transform .9s var(--ease-out)}
+.slide.active .fade-up{opacity:1;transform:translateY(0)}
+.slide.active .fade-up.d1{transition-delay:.4s}
+.slide.active .fade-up.d2{transition-delay:.6s}
+.slide.active .fade-up.d3{transition-delay:.8s}
+.slide.active .fade-up.d4{transition-delay:1.0s}
+.slide.active .fade-up.d5{transition-delay:1.2s}
+.slide.active .fade-up.d6{transition-delay:1.4s}
+
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.4em;color:var(--ice-soft);text-transform:uppercase;display:inline-flex;align-items:center;gap:.8rem}
+.eyebrow::before{content:"";width:36px;height:1px;background:linear-gradient(90deg,var(--ice),var(--halo))}
+h1.headline,h2.headline{font-family:'Fraunces',serif;font-weight:300;line-height:.98;letter-spacing:-.035em;color:var(--pearl)}
+h1.headline em,h2.headline em{font-style:italic;color:var(--halo);font-weight:400}
+h1.headline{font-size:clamp(2.4rem,6vw,5.4rem)}
+h2.headline{font-size:clamp(2rem,4.6vw,3.8rem)}
+.lede{font-size:1.05rem;line-height:1.75;color:var(--pearl);font-weight:300;max-width:560px}
+.lede b{color:var(--halo);font-weight:500}
+
+.hook{
+  margin-top:2rem;display:flex;align-items:baseline;gap:.9rem;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+  font-size:clamp(1.1rem,1.6vw,1.45rem);color:var(--ice-soft);
+}
+.hook::before{
+  content:"↳";font-family:'JetBrains Mono',monospace;font-style:normal;
+  color:var(--ice);font-size:1.3rem;opacity:.95;
+}
+.hook em{color:var(--pearl);font-weight:500;text-decoration:underline;text-decoration-color:rgba(56,189,248,.55);text-underline-offset:6px;text-decoration-thickness:1px}
+
+.brand{position:fixed;top:1.4rem;left:1.6rem;display:flex;align-items:center;gap:.7rem;z-index:300;text-decoration:none}
+.brand img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 18px rgba(56,189,248,.65))}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-text .nm{font-family:'Fraunces',serif;font-style:italic;font-size:1rem;color:var(--halo);letter-spacing:.04em}
+.brand-text .by{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;color:var(--linen);text-transform:uppercase;margin-top:2px}
+.slide-num{position:fixed;top:1.8rem;right:2.2rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--linen);z-index:300}
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--ice),var(--halo));z-index:301;transition:width .8s var(--ease);box-shadow:0 0 14px rgba(56,189,248,.8);width:8.33%}
+
+.nav{position:fixed;left:1.5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:1rem;z-index:300;background:rgba(10,26,46,.6);backdrop-filter:blur(12px);padding:1.2rem .5rem;border:1px solid rgba(56,189,248,.25);border-radius:50px}
+.nav-btn{width:28px;height:28px;border:none;background:transparent;color:var(--ice-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;border-radius:50%;transition:background .2s}
+.nav-btn:hover{background:rgba(56,189,248,.18)}
+.nav-btn:disabled{opacity:.25;cursor:not-allowed}
+.dots{display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--linen);transition:all .4s var(--ease);cursor:pointer;opacity:.5}
+.dot.active{background:var(--ice);height:18px;border-radius:3px;opacity:1;box-shadow:0 0 10px rgba(56,189,248,.75)}
+
+/* SLIDE 1 — HERO */
+#s1{flex-direction:column;text-align:center;gap:1.8rem}
+#s1 .hero-logo{
+  width:min(240px,24vw);max-height:26vh;object-fit:contain;
+  filter:drop-shadow(0 14px 70px rgba(56,189,248,.55)) drop-shadow(0 4px 24px rgba(125,211,252,.4));
+  opacity:0;transform:translateY(20px) scale(.95);
+  transition:opacity 1.2s var(--ease-out), transform 1.4s var(--ease-out);
+}
+.slide.active#s1 .hero-logo{opacity:1;transform:translateY(0) scale(1)}
+#s1 h1{max-width:1100px}
+#s1 .lede{margin:0 auto;text-align:center;max-width:720px}
+#s1 .eyebrow{justify-content:center}
+
+.card{
+  position:relative;padding:1.8rem;
+  background:linear-gradient(180deg,rgba(16,44,74,.85),rgba(10,26,46,.94));
+  border:1px solid rgba(56,189,248,.28);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 0 0 1px rgba(56,189,248,.06);
+  backdrop-filter:blur(8px);
+}
+
+/* SLIDE 2 */
+#s2 .wrap{position:relative;z-index:5;width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:5rem;align-items:center}
+.log-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--ice-soft);text-transform:uppercase;margin-bottom:.6rem}
+.log-card .title{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--pearl);font-weight:300;margin-bottom:1.2rem}
+.log-list{display:flex;flex-direction:column;gap:.55rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--pearl)}
+.log-list .row{display:grid;grid-template-columns:90px 1fr auto;gap:.8rem;padding:.45rem .2rem;border-bottom:1px dashed rgba(56,189,248,.16)}
+.log-list .row:last-child{border-bottom:none}
+.log-list .t{color:var(--linen)}
+.log-list .v{color:var(--ice-soft);text-align:right}
+.log-list .row.warn .v{color:#FCA5A5;font-weight:500}
+.log-list .row.peak .v{color:var(--halo);font-weight:500}
+
+/* SLIDE 3 */
+#s3 .wrap{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:2.4rem;align-items:flex-start}
+#s3 .head-row{display:flex;flex-direction:column;gap:1rem;max-width:820px}
+.bake-rail{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;width:100%}
+.bake-card{
+  position:relative;padding:1.6rem 1.5rem;border:1px solid rgba(56,189,248,.20);
+  background:linear-gradient(180deg,rgba(16,44,74,.85),rgba(10,26,46,.92));
+  border-radius:5px;display:flex;flex-direction:column;gap:.6rem;
+  backdrop-filter:blur(6px);
+}
+.bake-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--linen);text-transform:uppercase}
+.bake-card .name{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--pearl);font-weight:300;letter-spacing:-.01em}
+.bake-card .quote{font-family:'Fraunces',serif;font-style:italic;font-size:.92rem;color:var(--linen);line-height:1.55;border-left:2px solid rgba(56,189,248,.35);padding-left:.8rem}
+.bake-card .pill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:#FCA5A5;padding-top:.6rem;margin-top:.3rem;border-top:1px dashed rgba(252,165,165,.3)}
+.bake-card.warn .pill{color:#FDE68A;border-top-color:rgba(253,230,138,.32)}
+.bake-card.good .pill{color:var(--ice-soft);border-top-color:rgba(56,189,248,.4)}
+
+/* SLIDE 4 */
+#s4 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;gap:1.6rem;align-items:center;text-align:center}
+.video-frame{
+  position:relative;width:100%;max-width:820px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;
+  border:1px solid rgba(56,189,248,.35);
+  box-shadow:0 30px 80px rgba(0,0,0,.65),0 0 60px rgba(56,189,248,.22);
+  background:#000;
+}
+.video-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.video-frame .placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  background:radial-gradient(circle at center, rgba(16,44,74,1), rgba(5,13,26,1) 80%);
+}
+.play{
+  width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,var(--halo),var(--ice));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(56,189,248,.7);cursor:pointer;
+  transition:transform .3s var(--ease-out);
+}
+.play:hover{transform:scale(1.08)}
+.play::before{
+  content:"";width:0;height:0;margin-left:6px;
+  border-left:24px solid var(--ink);
+  border-top:14px solid transparent;border-bottom:14px solid transparent;
+}
+.video-frame .cap{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--linen);text-transform:uppercase}
+.video-frame .corners::before,.video-frame .corners::after{content:"";position:absolute;width:24px;height:24px;border:1px solid var(--ice)}
+.video-frame .corners::before{top:14px;left:14px;border-right:none;border-bottom:none}
+.video-frame .corners::after{bottom:14px;right:14px;border-left:none;border-top:none}
+
+/* SLIDE 5 */
+#s5 .wrap{width:100%;max-width:980px;display:flex;flex-direction:column;gap:1.4rem}
+.chat{
+  background:linear-gradient(180deg,rgba(16,44,74,.92),rgba(10,26,46,.94));
+  border:1px solid rgba(56,189,248,.25);border-radius:8px;
+  padding:1.8rem;display:flex;flex-direction:column;gap:1.1rem;
+  backdrop-filter:blur(8px);box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.chat-row{display:flex;gap:1rem;align-items:flex-start}
+.chat-row .who{
+  flex:none;width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;
+}
+.chat-row.user .who{background:rgba(186,230,253,.14);color:var(--halo);border:1px solid rgba(186,230,253,.4)}
+.chat-row.ai .who{background:rgba(56,189,248,.12);color:var(--ice-soft);border:1px solid rgba(56,189,248,.5);overflow:hidden;padding:0}
+.chat-row.ai .who img{width:100%;height:100%;object-fit:contain;padding:3px}
+.bubble-msg{
+  flex:1;padding:1rem 1.2rem;border-radius:6px;font-size:1rem;line-height:1.6;
+  background:rgba(240,249,255,.03);border:1px solid rgba(56,189,248,.14);color:var(--pearl);
+}
+.bubble-msg.q{font-family:'Fraunces',serif;font-style:italic;color:var(--pearl);font-size:1.1rem}
+.bubble-msg .meta{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;
+  letter-spacing:.25em;color:var(--linen);margin-bottom:.5rem;text-transform:uppercase;
+}
+.bubble-msg b{color:var(--halo);font-weight:500}
+.bubble-msg .flag{color:var(--ice-soft);font-weight:500}
+
+/* SLIDE 6 */
+#s6 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.1fr;gap:4rem;align-items:center}
+.blueprint{
+  position:relative;padding:2rem;
+  background:linear-gradient(180deg,rgba(16,44,74,.7),rgba(10,26,46,.92));
+  border:1px solid rgba(56,189,248,.32);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 0 0 1px rgba(56,189,248,.06);
+}
+.blueprint::before{
+  content:"NEXT LESSON · DESIGNED";
+  position:absolute;top:-10px;left:1.5rem;background:var(--ink);
+  padding:0 .8rem;font-family:'JetBrains Mono',monospace;
+  font-size:.55rem;letter-spacing:.3em;color:var(--ice-soft);
+}
+.spec-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.05rem 0;border-bottom:1px dashed rgba(56,189,248,.18);gap:1rem;
+}
+.spec-row:last-child{border-bottom:none}
+.spec-row .k{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--linen);text-transform:uppercase}
+.spec-row .v{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--pearl);font-weight:300;text-align:right}
+.spec-row .v small{display:block;font-family:'Inter',sans-serif;font-size:.62rem;color:var(--ice-soft);letter-spacing:.15em;text-transform:uppercase;margin-top:.25rem;font-weight:500}
+
+/* SLIDE 7 */
+#s7 .wrap{width:100%;max-width:1080px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem}
+.alert-card{
+  width:100%;max-width:880px;padding:2.2rem 2.4rem;
+  background:linear-gradient(135deg,rgba(56,189,248,.14),rgba(16,44,74,.94));
+  border:1px solid rgba(56,189,248,.45);border-radius:6px;
+  position:relative;overflow:hidden;text-align:left;
+  box-shadow:0 30px 80px rgba(56,189,248,.16),inset 0 0 0 1px rgba(56,189,248,.1);
+}
+.alert-card::before{
+  content:"⚠";position:absolute;top:1rem;right:1.5rem;font-size:2.2rem;
+  color:var(--ice);opacity:.75;
+}
+.alert-card .tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--ice);text-transform:uppercase;margin-bottom:1rem}
+.alert-card .observed{font-family:'Fraunces',serif;font-style:italic;font-size:1.3rem;color:var(--pearl);margin-bottom:1.5rem;line-height:1.45}
+.alert-card .verdict{
+  display:flex;gap:1.2rem;align-items:flex-start;padding-top:1.4rem;
+  border-top:1px solid rgba(56,189,248,.3);
+}
+.alert-card .verdict .label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;color:var(--linen);text-transform:uppercase;flex:none;min-width:90px;padding-top:.3rem}
+.alert-card .verdict .body{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--ice-soft);line-height:1.5}
+.alert-card .verdict .body b{color:var(--pearl);font-weight:500}
+
+/* SLIDE 8 */
+#s8 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.4rem;text-align:center}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;width:100%;max-width:980px;text-align:left}
+.price{
+  position:relative;padding:2.2rem;border:1px solid rgba(56,189,248,.25);
+  background:linear-gradient(180deg,rgba(16,44,74,.88),rgba(10,26,46,.92));
+  border-radius:6px;backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;gap:1rem;
+  transition:transform .5s var(--ease-out),border-color .5s;
+}
+.price:hover{transform:translateY(-4px);border-color:rgba(56,189,248,.6)}
+.price.featured{border-color:rgba(56,189,248,.6);box-shadow:0 0 60px rgba(56,189,248,.18)}
+.price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--ice-soft);text-transform:uppercase}
+.price h3{font-family:'Fraunces',serif;font-weight:300;font-size:2rem;color:var(--pearl);letter-spacing:-.02em}
+.price .amount{display:flex;align-items:baseline;gap:.4rem;margin-top:.2rem}
+.price .amount .big{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--halo);font-weight:400;line-height:1}
+.price .amount .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--linen);text-transform:uppercase}
+.price p{font-size:.93rem;line-height:1.6;color:var(--pearl);font-weight:300}
+
+/* SLIDE 9 */
+#s9 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1.05fr 1fr;gap:4.5rem;align-items:center}
+.ref-vis{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.ref-center{
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--halo),var(--ice-deep));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;color:var(--ink);font-size:1.4rem;font-weight:600;
+  box-shadow:0 0 60px rgba(56,189,248,.75);z-index:3;
+}
+.ref-orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(56,189,248,.36);animation:spin 80s linear infinite}
+.ref-orbit.outer{inset:-8%;animation-duration:120s;animation-direction:reverse;border-color:rgba(186,230,253,.22)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ref-node{
+  position:absolute;width:62px;height:62px;border-radius:50%;
+  background:rgba(16,44,74,.92);border:1px solid rgba(56,189,248,.55);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--ice-soft);
+  letter-spacing:.1em;backdrop-filter:blur(4px);
+}
+.ref-node.n1{top:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n2{top:50%;right:5%;transform:translateY(-50%)}
+.ref-node.n3{bottom:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n4{top:50%;left:5%;transform:translateY(-50%)}
+.ref-roi{
+  position:absolute;bottom:-2rem;left:50%;transform:translateX(-50%);
+  font-family:'Fraunces',serif;font-style:italic;color:var(--halo);
+  font-size:1.3rem;white-space:nowrap;
+}
+.metric-row{display:flex;flex-direction:column;gap:.9rem;margin-top:1.5rem}
+.metric{display:flex;align-items:baseline;gap:1rem;padding:1rem 1.2rem;background:rgba(16,44,74,.5);border:1px solid rgba(56,189,248,.2);border-radius:5px}
+.metric .num{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--halo);font-weight:400;min-width:90px}
+.metric .desc{font-size:.95rem;color:var(--pearl);font-weight:300}
+
+/* SLIDE 10 */
+#s10 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.dfy-steps{display:flex;flex-direction:column;gap:.9rem;margin-top:1.6rem}
+.dfy-step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.1rem;background:rgba(16,44,74,.5);border:1px solid rgba(56,189,248,.2);border-radius:5px}
+.dfy-step .n{flex:none;width:30px;height:30px;border-radius:50%;background:rgba(56,189,248,.16);border:1px solid rgba(56,189,248,.5);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--ice-soft)}
+.dfy-step .t{font-size:.95rem;color:var(--pearl);font-weight:300;line-height:1.5}
+.dfy-step .t b{color:var(--halo);font-weight:500}
+.dfy-price{
+  padding:2.4rem;border:1px solid rgba(56,189,248,.5);border-radius:8px;
+  background:linear-gradient(180deg,rgba(16,44,74,.9),rgba(10,26,46,.95));
+  box-shadow:0 0 80px rgba(56,189,248,.2);text-align:center;
+}
+.dfy-price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--ice-soft);text-transform:uppercase}
+.dfy-price h3{font-family:'Fraunces',serif;font-weight:300;font-size:1.9rem;color:var(--pearl);margin-top:.5rem}
+.dfy-price .big{font-family:'Fraunces',serif;font-size:4rem;color:var(--halo);font-weight:400;line-height:1;margin-top:1rem}
+.dfy-price .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.18em;color:var(--linen);text-transform:uppercase;margin-top:.3rem}
+.dfy-price .note{font-size:.85rem;color:var(--linen);font-weight:300;margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(56,189,248,.22);line-height:1.55}
+.dfy-price .note b{color:var(--pearl)}
+
+/* SLIDE 11 */
+#s11 .wrap{width:100%;max-width:1240px;display:flex;flex-direction:column;gap:2.4rem}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.feat{
+  padding:1.4rem 1.4rem 1.5rem;background:linear-gradient(180deg,rgba(16,44,74,.7),rgba(10,26,46,.85));
+  border:1px solid rgba(56,189,248,.2);border-radius:5px;
+  display:flex;flex-direction:column;gap:.5rem;
+  transition:border-color .4s,transform .4s;
+}
+.feat:hover{border-color:rgba(56,189,248,.55);transform:translateY(-2px)}
+.feat .icon{
+  width:38px;height:38px;border-radius:50%;background:rgba(56,189,248,.16);
+  border:1px solid rgba(56,189,248,.5);display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-style:italic;color:var(--ice-soft);font-size:1.1rem;margin-bottom:.5rem;
+}
+.feat h4{font-family:'Fraunces',serif;font-weight:400;font-size:1.1rem;color:var(--pearl);letter-spacing:-.01em}
+.feat p{font-size:.85rem;line-height:1.55;color:var(--linen);font-weight:300}
+
+/* SLIDE 12 */
+#s12{flex-direction:column;text-align:center;gap:2rem}
+#s12 .ring{
+  position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(56,189,248,.26);
+  transform:translate(-50%,-50%);pointer-events:none;animation:pulse 6s var(--ease) infinite;
+}
+#s12 .ring:nth-child(1){width:520px;height:520px}
+#s12 .ring:nth-child(2){width:760px;height:760px;animation-delay:1.5s;border-color:rgba(186,230,253,.18)}
+#s12 .ring:nth-child(3){width:1000px;height:1000px;animation-delay:3s;border-color:rgba(56,189,248,.08)}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+#s12 .emblem{width:140px;height:auto;filter:drop-shadow(0 8px 60px rgba(56,189,248,.65));z-index:5;position:relative}
+#s12 h2{position:relative;z-index:5;max-width:1000px}
+#s12 .cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:5}
+.cta{
+  display:inline-flex;align-items:center;gap:.7rem;
+  padding:1.1rem 1.9rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.3em;
+  text-transform:uppercase;text-decoration:none;border-radius:50px;
+  border:1px solid rgba(56,189,248,.5);color:var(--pearl);
+  transition:all .35s var(--ease-out);background:rgba(10,26,46,.6);backdrop-filter:blur(8px);
+}
+.cta:hover{transform:translateY(-2px);border-color:var(--halo);box-shadow:0 12px 30px rgba(56,189,248,.45)}
+.cta.primary{
+  background:linear-gradient(135deg,var(--halo),var(--ice-deep));color:var(--ink);border-color:transparent;
+  font-weight:600;box-shadow:0 12px 40px rgba(56,189,248,.5);
+}
+.cta.primary:hover{box-shadow:0 18px 60px rgba(56,189,248,.7)}
+.cta .arr{transition:transform .3s}
+.cta:hover .arr{transform:translateX(4px)}
+#s12 .closer{font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--linen);position:relative;z-index:5}
+
+.scroll-hint{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--linen);text-transform:uppercase;z-index:300;opacity:.7}
+
+@media(max-width:900px){
+  .slide{padding:5rem 1.2rem 6rem}
+  #s2 .wrap,#s6 .wrap,#s9 .wrap,#s10 .wrap{grid-template-columns:1fr;gap:2.5rem}
+  .bake-rail,.feat-grid,.price-grid{grid-template-columns:1fr 1fr}
+  h1.headline{font-size:2.2rem}
+  h2.headline{font-size:1.85rem}
+}
+</style>
+</head>
+<body>
+
+<a class="brand" href="#">
+  <img src="img/wisp-logo.png" alt="WISP Ocrat">
+  <span class="brand-text">
+    <span class="nm">WISP Ocrat</span>
+    <span class="by">By Olyoqx</span>
+  </span>
+</a>
+<div class="slide-num" id="slideNum">01 — 12</div>
+<div class="progress" id="progress"></div>
+
+<div class="deck">
+
+<!-- ───── SLIDE 1: HERO ───── -->
+<div class="slide active" id="s1">
+  <div class="mesh"></div>
+  <div class="dust" id="d1"></div>
+  <img class="hero-logo" src="img/wisp-logo.png" alt="WISP Ocrat — The Memory of Your Classroom">
+  <div class="eyebrow fade-up d1">For Teachers · Tutors · Every Educator Who Has Ever Known Too Late</div>
+  <h1 class="headline">
+    <span class="reveal-mask"><span>No teacher got into this</span></span><br>
+    <span class="reveal-mask"><span>to watch a student fall behind <em>unnoticed.</em></span></span>
+  </h1>
+  <p class="lede fade-up d3">You planned the lesson. You marked the work. You showed up every day. Somewhere in that classroom is the student whose turning point you almost caught — your teaching history just can't tell you who needs you right now.</p>
+  <div class="hook fade-up d4">What if it <em>could?</em></div>
+</div>
+
+<!-- ───── SLIDE 2: HIDDEN SIGNAL ───── -->
+<div class="slide" id="s2">
+  <div class="mesh"></div>
+  <div class="dust" id="d2"></div>
+  <div class="wrap">
+    <div class="card log-card fade-up">
+      <div class="label">Class Signal Log · Last 5 Entries</div>
+      <div class="title">It's been logging. You haven't.</div>
+      <div class="log-list">
+        <div class="row"><span class="t">Mon · Unit 3</span><span>Jamal · assessment</span><span class="v">71%</span></div>
+        <div class="row"><span class="t">Tue · Unit 3</span><span>Jamal · homework</span><span class="v">missed</span></div>
+        <div class="row warn"><span class="t">Wed · Q&amp;A</span><span>Jamal · questions asked</span><span class="v">0 · 19 days</span></div>
+        <div class="row"><span class="t">Thu · Unit 3</span><span>Cohort weakness · Topic 4.2</span><span class="v">7 of 28</span></div>
+        <div class="row warn"><span class="t">Fri · Mock</span><span>Jamal · trajectory</span><span class="v">↓ slow fade</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow fade-up">The Living Pattern · Always There · Never Captured</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Your classroom has been</span></span><br>
+        <span class="reveal-mask"><span>telling you <em>who needs help.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Every lesson is a data point. <b>Who answered. Who went quiet. Who scored 71% three times in a row and is about to drop.</b> A missed homework is a signal. A dropped score is a signal. A student who stopped asking questions is a signal.</p>
+      <div class="hook fade-up d4">What does the record <em>say?</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 3: SILENT STRUGGLE ───── -->
+<div class="slide" id="s3">
+  <div class="mesh"></div>
+  <div class="dust" id="d3"></div>
+  <div class="wrap">
+    <div class="head-row">
+      <div class="eyebrow fade-up">Your Silent Struggle</div>
+      <h2 class="headline">
+        <span class="reveal-mask"><span>Every class tells</span></span><br>
+        <span class="reveal-mask"><span>a story you <em>don't have time to read.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Same lesson. Same room. Same material delivered the same way. Three completely different stories unfolding — quietly, without flags, while you're already planning the next one.</p>
+    </div>
+    <div class="bake-rail">
+      <div class="bake-card warn fade-up d3">
+        <span class="label">Student · A · Mid-range · Consistent</span>
+        <span class="name">71%. 69%. 70%.</span>
+        <span class="quote">"Never flagged. Never a concern. Quietly plateaued for two terms."</span>
+        <span class="pill">→ Plateau undetected</span>
+      </div>
+      <div class="bake-card fade-up d4">
+        <span class="label">Student · B · Strong start · Fading</span>
+        <span class="name">Confident in September.</span>
+        <span class="quote">"Quiet by November. Failed the mock. Nobody flagged the slope."</span>
+        <span class="pill">→ Turning point missed</span>
+      </div>
+      <div class="bake-card good fade-up d5">
+        <span class="label">Student · C · Struggling · Visible</span>
+        <span class="name">On your radar.</span>
+        <span class="quote">"Getting your time. Getting the intervention. The other two aren't."</span>
+        <span class="pill">→ The one you caught</span>
+      </div>
+    </div>
+    <div class="hook fade-up d6" style="margin-top:.4rem">What if <em>one brain</em> was watching all three?</div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 4: WISP OCRAT LIVE ───── -->
+<div class="slide" id="s4">
+  <div class="mesh"></div>
+  <div class="dust" id="d4"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">WISP Ocrat · Live</div>
+    <h2 class="headline fade-up d1" style="margin-bottom:.3rem">
+      Meet the <em>memory</em> of your classroom.
+    </h2>
+    <div class="video-frame fade-up d2">
+      <video controls poster="img/wisp-logo.png">
+        <source src="video/wisp-ocrat-live.mp4" type="video/mp4">
+      </video>
+      <div class="placeholder">
+        <div class="corners"></div>
+        <div class="play"></div>
+        <div class="cap">WISP Ocrat · Live Demo · 02:22</div>
+      </div>
+    </div>
+    <div class="hook fade-up d3">What else does it <em>see?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 5: PATTERNS DECODED ───── -->
+<div class="slide" id="s5">
+  <div class="mesh"></div>
+  <div class="dust" id="d5"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Ask Anything</div>
+    <h2 class="headline fade-up d1">
+      Ask anything. WISP <em>answers back.</em>
+    </h2>
+    <div class="chat fade-up d2">
+      <div class="chat-row user">
+        <div class="who">YOU</div>
+        <div class="bubble-msg q">
+          <span class="meta">Teacher · 08:44</span>
+          "Jamal scored 71% on every assessment this term. Should I be worried?"
+        </div>
+      </div>
+      <div class="chat-row ai">
+        <div class="who"><img src="img/wisp-logo.png" alt=""></div>
+        <div class="bubble-msg">
+          <span class="meta">WISP Ocrat · pattern matched · 11 assessments</span>
+          Score variance is <b>narrowing — not stable</b>. Down <b>4% across 6 weeks</b>. Topic weakness clustering in <b>Unit 3</b> — same gap appearing in <b>7 of your 28 students</b>. Jamal hasn't asked a question in <b>19 days</b>.<br><br><span class="flag">This isn't a plateau. It's a slow fade — and it's caught early enough to stop.</span>
+        </div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What else does it <em>find?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 6: TEACHING BLUEPRINT ───── -->
+<div class="slide" id="s6">
+  <div class="mesh"></div>
+  <div class="dust" id="d6"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Next Lesson · Designed</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>From reacting to what went wrong</span></span><br>
+        <span class="reveal-mask"><span>to <em>knowing what to do before it does.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">WISP doesn't just remember. It composes. The next priority, the next intervention, the next review — written by every lesson that came before, tuned to this cohort, this week.</p>
+      <div class="hook fade-up d4">What about the assessments <em>already marked?</em></div>
+    </div>
+    <div class="blueprint fade-up d3">
+      <div class="spec-row">
+        <span class="k">Priority</span>
+        <span class="v">Unit 3 <small>↗ 7 students weak · reteach before assessment</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Intervention</span>
+        <span class="v">Jamal <small>↗ confidence drop · one-to-one this week</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Coverage Gap</span>
+        <span class="v">Topic 4.2 <small>↗ not revisited in 18 days · schedule review</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Next Assessment</span>
+        <span class="v">6 days <small>↗ 3 students not ready</small></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 7: DIAGNOSTIC ───── -->
+<div class="slide" id="s7">
+  <div class="mesh"></div>
+  <div class="dust" id="d7"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Assessment Analysis · Every Paper Finally Tells You Something Useful</div>
+    <h2 class="headline fade-up d1">
+      Upload the marked papers. <em>WISP reads the class.</em>
+    </h2>
+    <div class="alert-card fade-up d3">
+      <div class="tag">⚠ WISP Ocrat · Class Pattern Detected</div>
+      <div class="observed">"Question 6. Most students answered the concept correctly. Most lost marks on application."</div>
+      <div class="verdict">
+        <div class="label">Verdict</div>
+        <div class="body"><b>Not a knowledge gap. A transfer gap.</b> 11 of 28 students share the same error pattern. Last applied practice: <b>23 days ago</b>. Recommendation: one applied practice session before the next test.</div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">How much for a classroom that <em>never catches you off guard?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 8: PRICING ───── -->
+<div class="slide" id="s8">
+  <div class="mesh"></div>
+  <div class="dust" id="d8"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Yours · Forever</div>
+    <h2 class="headline fade-up d1">
+      Less than one term of <em>intervention that came too late.</em>
+    </h2>
+    <div class="price-grid">
+      <div class="price featured fade-up d2">
+        <span class="tag">One-time · Lifetime</span>
+        <h3>The WISP Ocrat Agent</h3>
+        <div class="amount"><span class="big">$97</span><span class="per">/ once</span></div>
+        <p>Full class memory. Full diagnostic. Full intervention planning. Yours for every term, every cohort, every subject you teach.</p>
+      </div>
+      <div class="price fade-up d3">
+        <span class="tag">Membership</span>
+        <h3>Educator Circle</h3>
+        <div class="amount"><span class="big">$19</span><span class="per">/ month</span></div>
+        <p>Live planning sessions, shared resources, class trend benchmarking, weekly teaching reviews. The collective intelligence behind the agent.</p>
+      </div>
+    </div>
+    <div class="hook fade-up d4">But what if it <em>pays for itself?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 9: REFERRALS ───── -->
+<div class="slide" id="s9">
+  <div class="mesh"></div>
+  <div class="dust" id="d9"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Build Your Circle · Earn</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Teach with</span></span><br>
+        <span class="reveal-mask"><span>your <em>people.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2"><b>30% recurring</b> — auto-active from day one. No forms, no waiting.</p>
+      <div class="metric-row">
+        <div class="metric fade-up d3"><span class="num">30%</span><span class="desc">recurring · active · day one</span></div>
+        <div class="metric fade-up d4"><span class="num">4</span><span class="desc">referrals = <b style="color:var(--halo)">120% ROI</b> — your subscription pays you</span></div>
+      </div>
+      <div class="hook fade-up d5" style="margin-top:1.6rem">What if you want <em>none of the setup — at all?</em></div>
+    </div>
+    <div class="ref-vis fade-up d3">
+      <div class="ref-orbit outer"></div>
+      <div class="ref-orbit"></div>
+      <div class="ref-center">YOU</div>
+      <div class="ref-node n1">+30%</div>
+      <div class="ref-node n2">+30%</div>
+      <div class="ref-node n3">+30%</div>
+      <div class="ref-node n4">+30%</div>
+      <div class="ref-roi">= 120% ROI</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 10: DONE FOR YOU ───── -->
+<div class="slide" id="s10">
+  <div class="mesh"></div>
+  <div class="dust" id="d10"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">White-Glove Setup · For the Teacher Who Just Wants to Teach</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>You handle the classroom.</span></span><br>
+        <span class="reveal-mask"><span>We handle <em>everything else.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">No terminals. No command lines. No tech. WISP Ocrat is live and tracking your first lesson before we leave.</p>
+      <div class="dfy-steps">
+        <div class="dfy-step fade-up d3"><span class="n">1</span><span class="t">You purchase a <b>VPS · ~$4–6/month</b> — your account, your cost.</span></div>
+        <div class="dfy-step fade-up d4"><span class="n">2</span><span class="t">We get in. <b>Install WISP Ocrat, build your class profile</b>, walk out.</span></div>
+        <div class="dfy-step fade-up d5"><span class="n">3</span><span class="t">You walk into the room. <b>WISP is already learning your classroom.</b></span></div>
+      </div>
+    </div>
+    <div class="dfy-price fade-up d3">
+      <span class="tag">One-Time · Done-For-You</span>
+      <h3>White-Glove Install</h3>
+      <div class="big">$297</div>
+      <div class="per">/ one-time setup fee</div>
+      <div class="note">Hosting (~$4–6/mo) is yours. <b>Everything else is ours.</b> WISP Ocrat license sold separately.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 11: EDUCATOR CIRCLE ───── -->
+<div class="slide" id="s11">
+  <div class="mesh"></div>
+  <div class="dust" id="d11"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">The Collective Brain</div>
+    <h2 class="headline fade-up d1" style="max-width:1040px">
+      Educator Circle — where serious teachers <em>compare what's actually moving the needle.</em>
+    </h2>
+    <div class="feat-grid">
+      <div class="feat fade-up d2"><div class="icon">⏱</div><h4>Live planning sessions</h4><p>Weekly drop-ins with master educators. Plan side-by-side with teachers who've already cracked the unit.</p></div>
+      <div class="feat fade-up d2"><div class="icon">🜂</div><h4>Shared resource libraries</h4><p>Lesson plans and assessments from teachers on the same curriculum — the fresh stuff, not last decade's.</p></div>
+      <div class="feat fade-up d3"><div class="icon">⌬</div><h4>Class benchmarking</h4><p>Know what's hard for every class — and what's just hard for yours. Stop guessing where you stand.</p></div>
+      <div class="feat fade-up d3"><div class="icon">↻</div><h4>WISP updates first</h4><p>Every new pattern and feature rolls out to Circle members before anyone else.</p></div>
+      <div class="feat fade-up d4"><div class="icon">★</div><h4>Wins wall</h4><p>Post your breakthroughs. Get studied by people who understand exactly what it took.</p></div>
+      <div class="feat fade-up d4"><div class="icon">⇄</div><h4>Teaching buddy</h4><p>One-to-one with another educator when the class stops responding and you need a second opinion at 11pm.</p></div>
+    </div>
+    <div class="hook fade-up d5" style="margin-top:.4rem">What happens when your class data <em>meets 500 other classrooms?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 12: FINAL CTA ───── -->
+<div class="slide" id="s12">
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="mesh"></div>
+  <div class="dust" id="d12"></div>
+  <img class="emblem fade-up" src="img/wisp-logo.png" alt="WISP Ocrat">
+  <div class="eyebrow fade-up d1">The Guessing Ends Here</div>
+  <h2 class="headline">
+    <span class="reveal-mask"><span>Every term from now on</span></span><br>
+    <span class="reveal-mask"><span><em>remembers</em> the last.</span></span>
+  </h2>
+  <p class="lede fade-up d2" style="margin:0 auto;text-align:center">The student you almost missed — WISP Ocrat sees them first. The pattern behind your best lesson — already in your history. WISP Ocrat reads it back to you.</p>
+  <div class="cta-row fade-up d3">
+    <a href="#" class="cta primary"><span>Get WISP Ocrat · $97</span> <span class="arr">→</span></a>
+    <a href="#" class="cta"><span>Join Educator Circle · $19/mo</span> <span class="arr">→</span></a>
+  </div>
+  <div class="closer fade-up d4">WISP Ocrat · The Memory of Your Classroom</div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" disabled>←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn">→</button>
+</div>
+<div class="scroll-hint">Scroll · Arrows · Space</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('dots');
+const total=slides.length;
+let current=0;
+for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
+const dots=document.querySelectorAll('.dot');
+
+function goTo(n){
+  if(n===current||n<0||n>=total)return;
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current=n;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  document.getElementById('slideNum').textContent=String(current+1).padStart(2,'0')+' — '+String(total).padStart(2,'0');
+  document.getElementById('progress').style.width=((current+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').disabled=current===total-1;
+}
+document.getElementById('nextBtn').onclick=()=>goTo(current+1);
+document.getElementById('prevBtn').onclick=()=>goTo(current-1);
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key))goTo(Math.min(current+1,total-1));
+  if(['ArrowLeft','PageUp'].includes(e.key))goTo(Math.max(current-1,0));
+  if(e.key==='Home')goTo(0); if(e.key==='End')goTo(total-1);
+});
+let wheelLock=false;
+window.addEventListener('wheel',e=>{
+  if(wheelLock)return;
+  if(Math.abs(e.deltaY)<25)return;
+  wheelLock=true;setTimeout(()=>wheelLock=false,900);
+  goTo(current+(e.deltaY>0?1:-1));
+},{passive:true});
+
+function makeMotes(id,n){
+  const c=document.getElementById(id);if(!c)return;
+  for(let i=0;i<n;i++){
+    const b=document.createElement('div');b.className='mote';
+    const s=2+Math.random()*7;
+    b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${-s}px;animation-duration:${10+Math.random()*12}s;animation-delay:${Math.random()*10}s;opacity:0`;
+    c.appendChild(b);
+  }
+}
+if(location.hash){const m=location.hash.match(/s=(\d+)/);if(m)goTo(Math.max(0,Math.min(parseInt(m[1])-1,total-1)))}
+for(let i=1;i<=12;i++) makeMotes('d'+i, (i===1||i===12)?32:18);
+</script>
+</body>
+</html>

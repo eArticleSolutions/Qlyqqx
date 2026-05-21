@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symbia · Reef — The Memory of Your Reef</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Reef / Saltwater palette */
+  --cyan:#1FB6E6; --cyan-bright:#7DEFFF; --mint:#7DF9D4;
+  --coral:#FF6B5A; --xanthid:#F5C542;
+  --ink:#04131F; --ink-2:#07202F; --ink-3:#0A2A3D;
+  --muted:#3F5C6E; --text:#E8F4F8; --dim:#6B8A99;
+  --danger:#FF6B5A;
+  --ease:cubic-bezier(.7,.05,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* Caustic overlay + vignette */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:200;mix-blend-mode:overlay;opacity:.14;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.71 0 0 0 0 0.9 0 0 0 0.55 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:150;
+  background:radial-gradient(ellipse at center, transparent 45%, rgba(2,8,14,.7) 100%);
+}
+
+.deck{position:relative;width:100vw;height:100vh;background:var(--ink)}
+.slide{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;overflow:hidden;
+  transition:opacity .9s var(--ease);
+  padding:5rem 2rem 6rem;
+}
+.slide > *:not(.slide-bg):not(.mesh):not(.bubbles){position:relative;z-index:5}
+.slide.active{opacity:1;pointer-events:all}
+
+.slide-bg{
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  transform:scale(1.08);
+  animation:kenburns 24s var(--ease) infinite alternate;
+}
+.slide-bg::after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at center, rgba(4,19,31,.45) 0%, rgba(4,19,31,.82) 70%, rgba(4,19,31,.96) 100%);
+}
+@keyframes kenburns{
+  0%{transform:scale(1.08) translate(0,0)}
+  100%{transform:scale(1.14) translate(-1.5%,1%)}
+}
+
+#s1  .slide-bg{background-image:url("img/bg-reef-hero.jpg")}
+#s2  .slide-bg{background-image:url("img/bg-acro-macro.jpg")}
+#s3  .slide-bg{background-image:url("img/bg-data-streams.jpg")}
+#s4  .slide-bg{background-image:url("img/bg-bleached.jpg")}
+#s5  .slide-bg{background-image:url("img/bg-bubbles.jpg")}
+#s6  .slide-bg{background-image:url("img/bg-reef-hero.jpg")}
+#s7  .slide-bg{background-image:url("img/bg-tank-top.jpg")}
+#s8  .slide-bg{background-image:url("img/bg-rtn.jpg")}
+#s9  .slide-bg{background-image:url("img/bg-icp.jpg")}
+#s10 .slide-bg{background-image:url("img/bg-reef-wide.jpg")}
+#s11 .slide-bg{background-image:url("img/bg-school.jpg")}
+#s12 .slide-bg{background-image:url("img/bg-data-streams.jpg")}
+#s13 .slide-bg{background-image:url("img/bg-community.jpg")}
+#s14 .slide-bg{background-image:url("img/bg-reef-wide.jpg")}
+
+#s1  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(4,19,31,.55) 0%, rgba(4,19,31,.88) 70%, rgba(4,19,31,.97) 100%)}
+#s2  .slide-bg::after{background:linear-gradient(90deg, rgba(4,19,31,.95) 30%, rgba(4,19,31,.55) 100%)}
+#s3  .slide-bg::after{background:linear-gradient(180deg, rgba(4,19,31,.55) 0%, rgba(4,19,31,.92) 100%)}
+#s4  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(4,19,31,.55) 0%, rgba(4,19,31,.94) 80%)}
+#s5  .slide-bg::after{background:radial-gradient(ellipse at 70% 50%, rgba(4,19,31,.55) 0%, rgba(4,19,31,.92) 70%)}
+#s6  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(4,19,31,.65) 0%, rgba(4,19,31,.93) 75%)}
+#s7  .slide-bg::after{background:linear-gradient(90deg, rgba(4,19,31,.55) 0%, rgba(4,19,31,.92) 65%)}
+#s8  .slide-bg::after{background:radial-gradient(ellipse at center, rgba(80,20,12,.45) 0%, rgba(4,19,31,.95) 75%)}
+#s9  .slide-bg::after{background:linear-gradient(90deg, rgba(4,19,31,.92) 35%, rgba(4,19,31,.55) 100%)}
+#s10 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(4,19,31,.6) 0%, rgba(4,19,31,.92) 80%)}
+#s11 .slide-bg::after{background:linear-gradient(90deg, rgba(4,19,31,.55) 0%, rgba(4,19,31,.92) 65%)}
+#s12 .slide-bg::after{background:linear-gradient(90deg, rgba(4,19,31,.92) 35%, rgba(4,19,31,.6) 100%)}
+#s13 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(4,19,31,.55) 0%, rgba(4,19,31,.9) 80%)}
+#s14 .slide-bg::after{background:radial-gradient(ellipse at center, rgba(4,19,31,.5) 0%, rgba(4,19,31,.88) 70%, rgba(4,19,31,.96) 100%)}
+
+.mesh{
+  position:absolute;inset:-10%;z-index:1;
+  background:
+    radial-gradient(at 20% 30%, rgba(31,182,230,.16), transparent 55%),
+    radial-gradient(at 80% 70%, rgba(125,249,212,.10), transparent 60%);
+  filter:blur(60px);mix-blend-mode:screen;
+  animation:meshShift 18s var(--ease) infinite alternate;
+  pointer-events:none;
+}
+@keyframes meshShift{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(2%,-3%) scale(1.05)}
+  100%{transform:translate(-3%,2%) scale(1.08)}
+}
+
+/* Bubbles — saltwater */
+.bubbles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.bubble{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(125,239,255,.55), rgba(31,182,230,.05) 70%);
+  border:1px solid rgba(125,239,255,.25);
+  animation:rise linear infinite;
+  box-shadow:inset 0 0 8px rgba(180,240,255,.3);
+}
+@keyframes rise{
+  0%{transform:translateY(0) scale(1) translateX(0);opacity:0}
+  10%{opacity:1}
+  50%{transform:translateY(-50vh) scale(.9) translateX(20px)}
+  90%{opacity:.5}
+  100%{transform:translateY(-110vh) scale(.5) translateX(-20px);opacity:0}
+}
+
+/* Reveal helpers */
+.reveal-mask{display:inline-block;overflow:hidden;vertical-align:bottom}
+.reveal-mask > span{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease-out)}
+.slide.active .reveal-mask > span{transform:translateY(0)}
+.slide.active .reveal-mask:nth-child(2) > span{transition-delay:.1s}
+.slide.active .reveal-mask:nth-child(3) > span{transition-delay:.2s}
+.slide.active .reveal-mask:nth-child(4) > span{transition-delay:.3s}
+
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .9s var(--ease-out), transform .9s var(--ease-out)}
+.slide.active .fade-up{opacity:1;transform:translateY(0)}
+.slide.active .fade-up.d1{transition-delay:.4s}
+.slide.active .fade-up.d2{transition-delay:.6s}
+.slide.active .fade-up.d3{transition-delay:.8s}
+.slide.active .fade-up.d4{transition-delay:1.0s}
+.slide.active .fade-up.d5{transition-delay:1.2s}
+.slide.active .fade-up.d6{transition-delay:1.4s}
+
+/* Typography */
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.4em;color:var(--cyan);text-transform:uppercase;display:inline-flex;align-items:center;gap:.8rem}
+.eyebrow::before{content:"";width:36px;height:1px;background:var(--cyan)}
+h1.headline,h2.headline{font-family:'Fraunces',serif;font-weight:300;line-height:.98;letter-spacing:-.035em;color:var(--text)}
+h1.headline em,h2.headline em{font-style:italic;color:var(--cyan-bright);font-weight:400}
+h1.headline{font-size:clamp(2.6rem,6.4vw,5.8rem)}
+h2.headline{font-size:clamp(2.1rem,4.8vw,4rem)}
+.lede{font-size:1.05rem;line-height:1.75;color:var(--text);font-weight:300;max-width:560px}
+.lede b{color:var(--cyan-bright);font-weight:500}
+
+/* Hook */
+.hook{
+  margin-top:2rem;display:flex;align-items:baseline;gap:.9rem;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+  font-size:clamp(1.15rem,1.7vw,1.5rem);color:var(--cyan-bright);
+}
+.hook::before{
+  content:"↳";font-family:'JetBrains Mono',monospace;font-style:normal;
+  color:var(--cyan);font-size:1.3rem;opacity:.85;
+}
+.hook em{color:var(--text);font-weight:500;text-decoration:underline;text-decoration-color:rgba(31,182,230,.55);text-underline-offset:6px;text-decoration-thickness:1px}
+
+/* Brand chrome */
+.brand{position:fixed;top:1.4rem;left:1.6rem;display:flex;align-items:center;gap:.7rem;z-index:300;text-decoration:none}
+.brand img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(31,182,230,.55))}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-text .nm{font-family:'Fraunces',serif;font-style:italic;font-size:.95rem;color:var(--cyan);letter-spacing:.04em}
+.brand-text .by{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;margin-top:2px}
+.slide-num{position:fixed;top:1.8rem;right:2.2rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--dim);z-index:300}
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--cyan-bright));z-index:301;transition:width .8s var(--ease);box-shadow:0 0 14px rgba(31,182,230,.7);width:7.14%}
+
+/* Nav */
+.nav{position:fixed;left:1.5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:1rem;z-index:300;background:rgba(4,19,31,.45);backdrop-filter:blur(12px);padding:1.2rem .5rem;border:1px solid rgba(31,182,230,.18);border-radius:50px}
+.nav-btn{width:28px;height:28px;border:none;background:transparent;color:var(--cyan);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;border-radius:50%;transition:background .2s}
+.nav-btn:hover{background:rgba(31,182,230,.18)}
+.nav-btn:disabled{opacity:.25;cursor:not-allowed}
+.dots{display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:all .4s var(--ease);cursor:pointer}
+.dot.active{background:var(--cyan);height:18px;border-radius:3px;box-shadow:0 0 10px rgba(31,182,230,.6)}
+
+/* SLIDE 1 — HERO */
+#s1{flex-direction:column;text-align:center;gap:2rem}
+#s1 .hero-logo{
+  width:min(220px,22vw);max-height:20vh;object-fit:contain;
+  filter:drop-shadow(0 10px 40px rgba(31,182,230,.55));
+  opacity:0;transform:translateY(20px) scale(.95);
+  transition:opacity 1.2s var(--ease-out), transform 1.4s var(--ease-out);
+}
+.slide.active#s1 .hero-logo{opacity:1;transform:translateY(0) scale(1)}
+#s1 h1{max-width:1100px}
+#s1 .lede{margin:0 auto;text-align:center;max-width:640px}
+#s1 .eyebrow{justify-content:center}
+
+/* SLIDE 2 — DRIFT GRAPH */
+#s2 .wrap{position:relative;z-index:5;width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:5rem;align-items:center}
+.drift-card{
+  position:relative;padding:1.8rem;
+  background:linear-gradient(180deg,rgba(7,32,47,.85),rgba(4,19,31,.92));
+  border:1px solid rgba(31,182,230,.28);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px rgba(31,182,230,.08);
+  backdrop-filter:blur(8px);
+}
+.drift-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase;margin-bottom:.6rem}
+.drift-card .title{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--text);font-weight:300;margin-bottom:1.2rem}
+.drift-svg{width:100%;height:200px;display:block}
+.drift-axis{stroke:rgba(125,239,255,.18);stroke-width:1;stroke-dasharray:2 4}
+.drift-line{fill:none;stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 6px rgba(31,182,230,.5));stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset 2s var(--ease-out) .8s}
+.slide.active .drift-line{stroke-dashoffset:0}
+.drift-band{fill:rgba(31,182,230,.06)}
+.drift-pt{fill:var(--coral);filter:drop-shadow(0 0 6px rgba(255,107,90,.7))}
+.drift-stats{display:flex;gap:1.4rem;margin-top:1rem;padding-top:1rem;border-top:1px dashed rgba(31,182,230,.2)}
+.drift-stats div{flex:1}
+.drift-stats .k{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.25em;color:var(--dim);text-transform:uppercase}
+.drift-stats .v{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--text);font-weight:300;margin-top:.2rem}
+.drift-stats .v.warn{color:var(--coral)}
+
+/* SLIDE 3 — SOURCE CARDS */
+#s3 .wrap{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:2.4rem;align-items:flex-start}
+#s3 .head-row{display:flex;flex-direction:column;gap:1rem;max-width:780px}
+.source-rail{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;width:100%}
+.source-card{
+  position:relative;padding:1.6rem 1.5rem;border:1px solid rgba(31,182,230,.18);
+  background:linear-gradient(180deg,rgba(7,32,47,.85),rgba(4,19,31,.85));
+  border-radius:5px;display:flex;flex-direction:column;gap:.6rem;
+  backdrop-filter:blur(6px);
+}
+.source-card .label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase}
+.source-card .name{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--text);font-weight:300;letter-spacing:-.01em}
+.source-card .desc{font-size:.88rem;color:var(--dim);font-weight:300;line-height:1.55}
+.source-card .pill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--coral);padding-top:.6rem;margin-top:.3rem;border-top:1px dashed rgba(255,107,90,.3)}
+
+/* SLIDE 4 — CRASH STATS */
+#s4 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.6rem;text-align:center}
+.crash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;width:100%;max-width:980px}
+.crash-stat{
+  padding:2rem 1.6rem;border:1px solid rgba(255,107,90,.28);
+  background:linear-gradient(180deg,rgba(40,12,8,.5),rgba(4,19,31,.85));
+  border-radius:6px;text-align:left;backdrop-filter:blur(6px);
+  box-shadow:0 30px 60px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,107,90,.06);
+}
+.crash-stat .big{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--coral);font-weight:300;line-height:1;letter-spacing:-.02em}
+.crash-stat .l{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;margin-top:.8rem}
+.crash-stat .d{font-size:.95rem;color:var(--text);font-weight:300;margin-top:.5rem;line-height:1.5}
+
+/* SLIDE 5 — VIDEO */
+#s5 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;gap:1.6rem;align-items:center;text-align:center}
+.video-frame{
+  position:relative;width:100%;max-width:760px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;
+  border:1px solid rgba(31,182,230,.32);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(31,182,230,.15);
+  background:#000;
+}
+.video-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.video-frame .placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  background:radial-gradient(circle at center, rgba(7,32,47,1), rgba(4,19,31,1) 80%);
+}
+.play{
+  width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan-bright),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(31,182,230,.6);cursor:pointer;
+  transition:transform .3s var(--ease-out);
+}
+.play:hover{transform:scale(1.08)}
+.play::before{
+  content:"";width:0;height:0;margin-left:6px;
+  border-left:24px solid var(--ink);
+  border-top:14px solid transparent;border-bottom:14px solid transparent;
+}
+.video-frame .cap{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--dim);text-transform:uppercase}
+.video-frame .corners::before,.video-frame .corners::after{content:"";position:absolute;width:24px;height:24px;border:1px solid var(--cyan)}
+.video-frame .corners::before{top:14px;left:14px;border-right:none;border-bottom:none}
+.video-frame .corners::after{bottom:14px;right:14px;border-left:none;border-top:none}
+
+/* SLIDE 6 — CHAT */
+#s6 .wrap{width:100%;max-width:980px;display:flex;flex-direction:column;gap:1.6rem}
+.chat{
+  background:linear-gradient(180deg,rgba(7,32,47,.92),rgba(4,19,31,.94));
+  border:1px solid rgba(31,182,230,.25);border-radius:8px;
+  padding:1.8rem;display:flex;flex-direction:column;gap:1.1rem;
+  backdrop-filter:blur(8px);box-shadow:0 30px 80px rgba(0,0,0,.55);
+}
+.chat-row{display:flex;gap:1rem;align-items:flex-start}
+.chat-row .who{
+  flex:none;width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;
+}
+.chat-row.user .who{background:rgba(31,182,230,.14);color:var(--cyan-bright);border:1px solid rgba(31,182,230,.4)}
+.chat-row.ai .who{background:rgba(125,249,212,.12);color:var(--mint);border:1px solid rgba(125,249,212,.4);overflow:hidden;padding:0}
+.chat-row.ai .who img{width:100%;height:100%;object-fit:contain;padding:4px}
+.bubble-msg{
+  flex:1;padding:1rem 1.2rem;border-radius:6px;font-size:1rem;line-height:1.6;
+  background:rgba(255,255,255,.02);border:1px solid rgba(31,182,230,.12);
+}
+.bubble-msg.q{font-family:'Fraunces',serif;font-style:italic;color:var(--text);font-size:1.1rem}
+.bubble-msg .meta{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;
+  letter-spacing:.25em;color:var(--dim);margin-bottom:.5rem;text-transform:uppercase;
+}
+.bubble-msg b{color:var(--cyan-bright);font-weight:500}
+.bubble-msg .flag{color:var(--xanthid);font-weight:500}
+
+/* SLIDE 7 — BLUEPRINT */
+#s7 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.1fr;gap:4rem;align-items:center}
+.blueprint{
+  position:relative;padding:2rem;
+  background:linear-gradient(180deg,rgba(7,32,47,.7),rgba(4,19,31,.9));
+  border:1px solid rgba(31,182,230,.3);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px rgba(31,182,230,.06);
+}
+.blueprint::before{
+  content:"YOUR REEF · DESIGNED";
+  position:absolute;top:-10px;left:1.5rem;background:var(--ink);
+  padding:0 .8rem;font-family:'JetBrains Mono',monospace;
+  font-size:.55rem;letter-spacing:.3em;color:var(--cyan);
+}
+.spec-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.05rem 0;border-bottom:1px dashed rgba(31,182,230,.18);gap:1rem;
+}
+.spec-row:last-child{border-bottom:none}
+.spec-row .k{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.spec-row .v{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--text);font-weight:300;text-align:right}
+.spec-row .v small{display:block;font-family:'Inter',sans-serif;font-size:.62rem;color:var(--mint);letter-spacing:.15em;text-transform:uppercase;margin-top:.25rem;font-weight:500}
+
+/* SLIDE 8 — ALERT */
+#s8 .wrap{width:100%;max-width:1080px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem}
+.alert-card{
+  width:100%;max-width:820px;padding:2.2rem 2.4rem;
+  background:linear-gradient(135deg,rgba(255,107,90,.14),rgba(7,32,47,.92));
+  border:1px solid rgba(255,107,90,.5);border-radius:6px;
+  position:relative;overflow:hidden;text-align:left;
+  box-shadow:0 30px 80px rgba(255,107,90,.18),inset 0 0 0 1px rgba(255,107,90,.1);
+}
+.alert-card::before{
+  content:"⚠";position:absolute;top:1rem;right:1.5rem;font-size:2.2rem;
+  color:var(--coral);opacity:.6;
+}
+.alert-card .tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--coral);text-transform:uppercase;margin-bottom:1rem}
+.alert-card .observed{font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;color:var(--text);margin-bottom:1.5rem;line-height:1.4}
+.alert-card .verdict{
+  display:flex;gap:1.2rem;align-items:flex-start;padding-top:1.4rem;
+  border-top:1px solid rgba(255,107,90,.28);
+}
+.alert-card .verdict .label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;color:var(--dim);text-transform:uppercase;flex:none;min-width:90px;padding-top:.3rem}
+.alert-card .verdict .body{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--cyan-bright);line-height:1.45}
+.alert-card .verdict .body b{color:#FFD0C8;font-weight:500}
+
+/* SLIDE 9 — ICP TABLE */
+#s9 .wrap{width:100%;max-width:1180px;display:grid;grid-template-columns:1fr 1.05fr;gap:4rem;align-items:center}
+.icp-card{
+  padding:1.8rem;background:linear-gradient(180deg,rgba(7,32,47,.85),rgba(4,19,31,.92));
+  border:1px solid rgba(31,182,230,.25);border-radius:6px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);backdrop-filter:blur(8px);
+}
+.icp-row{display:flex;align-items:center;justify-content:space-between;padding:.85rem 0;border-bottom:1px dashed rgba(31,182,230,.18);gap:1rem}
+.icp-row:last-child{border-bottom:none}
+.icp-row .el{font-family:'JetBrains Mono',monospace;font-size:.75rem;letter-spacing:.18em;color:var(--text);text-transform:uppercase;display:flex;align-items:center;gap:.7rem}
+.icp-row .el .sym{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:6px;background:rgba(31,182,230,.1);border:1px solid rgba(31,182,230,.3);font-family:'Fraunces',serif;font-size:.95rem;color:var(--cyan-bright)}
+.icp-row .val{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--text);font-weight:300}
+.icp-row .stat{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;padding:.3rem .6rem;border-radius:50px;border:1px solid currentColor}
+.icp-row.ok .stat{color:var(--mint)}
+.icp-row.warn .stat{color:var(--xanthid)}
+.icp-row.bad .stat{color:var(--coral)}
+
+/* SLIDE 10 — PRICING */
+#s10 .wrap{width:100%;max-width:1180px;display:flex;flex-direction:column;align-items:center;gap:2.6rem;text-align:center}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;width:100%;max-width:980px;text-align:left}
+.price{
+  position:relative;padding:2.2rem;border:1px solid rgba(31,182,230,.25);
+  background:linear-gradient(180deg,rgba(7,32,47,.88),rgba(4,19,31,.92));
+  border-radius:6px;backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;gap:1rem;
+  transition:transform .5s var(--ease-out),border-color .5s;
+}
+.price:hover{transform:translateY(-4px);border-color:rgba(31,182,230,.6)}
+.price.featured{border-color:rgba(125,239,255,.55);box-shadow:0 0 60px rgba(31,182,230,.18)}
+.price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase}
+.price h3{font-family:'Fraunces',serif;font-weight:300;font-size:2rem;color:var(--text);letter-spacing:-.02em}
+.price .amount{display:flex;align-items:baseline;gap:.4rem;margin-top:.2rem}
+.price .amount .big{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--cyan-bright);font-weight:400;line-height:1}
+.price .amount .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--dim);text-transform:uppercase}
+.price p{font-size:.95rem;line-height:1.6;color:var(--text);font-weight:300}
+
+/* SLIDE 11 — REFERRALS */
+#s11 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1.05fr 1fr;gap:4.5rem;align-items:center}
+.ref-vis{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.ref-center{
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--cyan-bright),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;color:var(--ink);font-size:1.4rem;font-weight:600;
+  box-shadow:0 0 60px rgba(31,182,230,.7);z-index:3;
+}
+.ref-orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(31,182,230,.3);animation:spin 80s linear infinite}
+.ref-orbit.outer{inset:-8%;animation-duration:120s;animation-direction:reverse;border-color:rgba(31,182,230,.18)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ref-node{
+  position:absolute;width:62px;height:62px;border-radius:50%;
+  background:rgba(7,32,47,.92);border:1px solid rgba(31,182,230,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--cyan-bright);
+  letter-spacing:.1em;backdrop-filter:blur(4px);
+}
+.ref-node.n1{top:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n2{top:50%;right:5%;transform:translateY(-50%)}
+.ref-node.n3{bottom:5%;left:50%;transform:translateX(-50%)}
+.ref-node.n4{top:50%;left:5%;transform:translateY(-50%)}
+.ref-roi{
+  position:absolute;bottom:-2rem;left:50%;transform:translateX(-50%);
+  font-family:'Fraunces',serif;font-style:italic;color:var(--mint);
+  font-size:1.3rem;white-space:nowrap;
+}
+.metric-row{display:flex;flex-direction:column;gap:.9rem;margin-top:1.5rem}
+.metric{display:flex;align-items:baseline;gap:1rem;padding:1rem 1.2rem;background:rgba(7,32,47,.5);border:1px solid rgba(31,182,230,.18);border-radius:5px}
+.metric .num{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--cyan-bright);font-weight:400;min-width:90px}
+.metric .desc{font-size:.95rem;color:var(--text);font-weight:300}
+
+/* SLIDE 12 — DFY */
+#s12 .wrap{width:100%;max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.dfy-steps{display:flex;flex-direction:column;gap:.9rem;margin-top:1.6rem}
+.dfy-step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.1rem;background:rgba(7,32,47,.5);border:1px solid rgba(31,182,230,.18);border-radius:5px}
+.dfy-step .n{flex:none;width:30px;height:30px;border-radius:50%;background:rgba(31,182,230,.15);border:1px solid rgba(31,182,230,.4);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--cyan-bright)}
+.dfy-step .t{font-size:.95rem;color:var(--text);font-weight:300;line-height:1.5}
+.dfy-step .t b{color:var(--cyan-bright);font-weight:500}
+.dfy-price{
+  padding:2.4rem;border:1px solid rgba(125,239,255,.55);border-radius:8px;
+  background:linear-gradient(180deg,rgba(7,32,47,.9),rgba(4,19,31,.95));
+  box-shadow:0 0 80px rgba(31,182,230,.18);text-align:center;
+}
+.dfy-price .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase}
+.dfy-price h3{font-family:'Fraunces',serif;font-weight:300;font-size:2rem;color:var(--text);margin-top:.5rem}
+.dfy-price .big{font-family:'Fraunces',serif;font-size:4rem;color:var(--cyan-bright);font-weight:400;line-height:1;margin-top:1rem}
+.dfy-price .per{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-top:.3rem}
+.dfy-price .note{font-size:.85rem;color:var(--dim);font-weight:300;margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(31,182,230,.2);line-height:1.55}
+.dfy-price .note b{color:var(--text)}
+
+/* SLIDE 13 — COMMUNITY */
+#s13 .wrap{width:100%;max-width:1240px;display:flex;flex-direction:column;gap:2.4rem}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.feat{
+  padding:1.4rem 1.4rem 1.5rem;background:linear-gradient(180deg,rgba(7,32,47,.7),rgba(4,19,31,.85));
+  border:1px solid rgba(31,182,230,.18);border-radius:5px;
+  display:flex;flex-direction:column;gap:.5rem;
+  transition:border-color .4s,transform .4s;
+}
+.feat:hover{border-color:rgba(31,182,230,.5);transform:translateY(-2px)}
+.feat .icon{
+  width:36px;height:36px;border-radius:50%;background:rgba(31,182,230,.12);
+  border:1px solid rgba(31,182,230,.4);display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-style:italic;color:var(--cyan-bright);font-size:1.1rem;margin-bottom:.5rem;
+}
+.feat h4{font-family:'Fraunces',serif;font-weight:400;font-size:1.1rem;color:var(--text);letter-spacing:-.01em}
+.feat p{font-size:.85rem;line-height:1.55;color:var(--dim);font-weight:300}
+
+/* SLIDE 14 — FINAL CTA */
+#s14{flex-direction:column;text-align:center;gap:2rem}
+#s14 .ring{
+  position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(31,182,230,.22);
+  transform:translate(-50%,-50%);pointer-events:none;animation:pulse 6s var(--ease) infinite;
+}
+#s14 .ring:nth-child(1){width:520px;height:520px}
+#s14 .ring:nth-child(2){width:760px;height:760px;animation-delay:1.5s;border-color:rgba(31,182,230,.13)}
+#s14 .ring:nth-child(3){width:1000px;height:1000px;animation-delay:3s;border-color:rgba(31,182,230,.07)}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+#s14 .emblem{width:110px;height:auto;filter:drop-shadow(0 8px 40px rgba(31,182,230,.65));z-index:5;position:relative}
+#s14 h2{position:relative;z-index:5;max-width:1000px}
+#s14 .cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:5}
+.cta{
+  display:inline-flex;align-items:center;gap:.7rem;
+  padding:1.1rem 1.9rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.3em;
+  text-transform:uppercase;text-decoration:none;border-radius:50px;
+  border:1px solid rgba(31,182,230,.5);color:var(--text);
+  transition:all .35s var(--ease-out);background:rgba(4,19,31,.55);backdrop-filter:blur(8px);
+}
+.cta:hover{transform:translateY(-2px);border-color:var(--cyan-bright);box-shadow:0 12px 30px rgba(31,182,230,.35)}
+.cta.primary{
+  background:linear-gradient(135deg,var(--cyan-bright),var(--cyan));color:var(--ink);border-color:transparent;
+  font-weight:500;box-shadow:0 12px 40px rgba(31,182,230,.45);
+}
+.cta.primary:hover{box-shadow:0 18px 60px rgba(31,182,230,.65)}
+.cta .arr{transition:transform .3s}
+.cta:hover .arr{transform:translateX(4px)}
+#s14 .closer{font-family:'Fraunces',serif;font-style:italic;font-size:1.15rem;color:var(--dim);position:relative;z-index:5}
+
+/* Hint */
+.scroll-hint{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.4em;color:var(--dim);text-transform:uppercase;z-index:300;opacity:.7}
+
+/* Responsive */
+@media(max-width:900px){
+  .slide{padding:5rem 1.2rem 6rem}
+  #s2 .wrap,#s7 .wrap,#s9 .wrap,#s11 .wrap,#s12 .wrap{grid-template-columns:1fr;gap:2.5rem}
+  .source-rail,.crash-stats,.feat-grid,.price-grid{grid-template-columns:1fr}
+  h1.headline{font-size:2.4rem}
+  h2.headline{font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<a class="brand" href="#">
+  <img src="img/symbia-emblem.png" alt="Symbia">
+  <span class="brand-text">
+    <span class="nm">Symbia</span>
+    <span class="by">Reef · By Qlyqqx</span>
+  </span>
+</a>
+<div class="slide-num" id="slideNum">01 — 14</div>
+<div class="progress" id="progress"></div>
+
+<div class="deck">
+
+<!-- ───── SLIDE 1: HERO ───── -->
+<div class="slide active" id="s1">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b1"></div>
+  <img class="hero-logo" src="img/symbia-logo.png" alt="Symbia — Memory of Your Reef">
+  <div class="eyebrow fade-up d1">For SPS &amp; LPS Keepers</div>
+  <h1 class="headline">
+    <span class="reveal-mask"><span>You built a living ocean.</span></span><br>
+    <span class="reveal-mask"><span>Now it's time it <em>talked back.</em></span></span>
+  </h1>
+  <p class="lede fade-up d3">Three test kits. A spreadsheet. A coral that's receding — and you don't know why. Your reef has been signalling this for weeks. You just can't read the signal.</p>
+  <div class="hook fade-up d4">What if you <em>could?</em></div>
+</div>
+
+<!-- ───── SLIDE 2: THE SWING ───── -->
+<div class="slide" id="s2">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b2"></div>
+  <div class="wrap">
+    <div class="drift-card fade-up">
+      <div class="label">Alkalinity · Last 14 Days</div>
+      <div class="title">The drift no one's watching</div>
+      <svg class="drift-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
+        <line class="drift-axis" x1="0" y1="60" x2="600" y2="60"/>
+        <line class="drift-axis" x1="0" y1="100" x2="600" y2="100"/>
+        <line class="drift-axis" x1="0" y1="140" x2="600" y2="140"/>
+        <rect class="drift-band" x="0" y="80" width="600" height="40"/>
+        <path class="drift-line" d="M0,90 C60,88 90,92 130,95 C180,100 220,108 270,118 C320,128 360,138 410,148 C460,156 510,162 600,170"/>
+        <circle class="drift-pt" cx="540" cy="166" r="5"/>
+      </svg>
+      <div class="drift-stats">
+        <div><div class="k">Day 1</div><div class="v">8.3 dKH</div></div>
+        <div><div class="k">Day 14</div><div class="v warn">7.4 dKH</div></div>
+        <div><div class="k">Drift</div><div class="v warn">−0.9</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow fade-up">Alk · The Silent Killer</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Alk doesn't crash.</span></span><br>
+        <span class="reveal-mask"><span>It <em>drifts.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">0.3 dKH here, 0.2 there — invisible over days. Your Acros are growing and pulling more. Your two-part hasn't moved since September. By the time you see bleaching, the swing happened <b>four days ago.</b></p>
+      <div class="hook fade-up d4">What if something had been <em>watching the drift?</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 3: PATTERN PROBLEM ───── -->
+<div class="slide" id="s3">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b3"></div>
+  <div class="wrap">
+    <div class="head-row">
+      <div class="eyebrow fade-up">Data Without Memory</div>
+      <h2 class="headline">
+        <span class="reveal-mask"><span>Hundreds of readings.</span></span><br>
+        <span class="reveal-mask"><span>Zero <em>connection.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">Apex logs. Trident readings. ICP PDFs in your downloads folder. No brain connecting them across time. Nobody saying: every time nitrate drops below 2 ppm, Alk consumption spikes six days later.</p>
+    </div>
+    <div class="source-rail">
+      <div class="source-card fade-up d3">
+        <span class="label">Source · 01</span>
+        <span class="name">Apex</span>
+        <span class="desc">Temp, pH, ORP — every minute, every day. Sitting in a graph you check once a week.</span>
+        <span class="pill">→ Disconnected</span>
+      </div>
+      <div class="source-card fade-up d4">
+        <span class="label">Source · 02</span>
+        <span class="name">Trident</span>
+        <span class="desc">Alk, Ca, Mg — three times a day. A wall of numbers nothing is reading.</span>
+        <span class="pill">→ Disconnected</span>
+      </div>
+      <div class="source-card fade-up d5">
+        <span class="label">Source · 03</span>
+        <span class="name">ICP PDFs</span>
+        <span class="desc">35 elements per panel, twice a year. Filed away the day they arrived.</span>
+        <span class="pill">→ Disconnected</span>
+      </div>
+    </div>
+    <div class="hook fade-up d6" style="margin-top:.4rem">What if <em>one brain held all of it?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 4: THE CRASH ───── -->
+<div class="slide" id="s4">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b4"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">The Real Cost</div>
+    <h2 class="headline fade-up d1">
+      Every reefer has a crash story. <em>Yours didn't have to happen.</em>
+    </h2>
+    <p class="lede fade-up d2" style="text-align:center;margin:0 auto">The data was there. It just wasn't connected.</p>
+    <div class="crash-stats">
+      <div class="crash-stat fade-up d3">
+        <div class="big">$2,400</div>
+        <div class="l">Average Loss · SPS</div>
+        <div class="d">Per crash event. Some keepers lose three colonies in a single weekend swing.</div>
+      </div>
+      <div class="crash-stat fade-up d4">
+        <div class="big">1×</div>
+        <div class="l">Major event · per year</div>
+        <div class="d">Industry average across keepers running stable systems for 24+ months.</div>
+      </div>
+      <div class="crash-stat fade-up d5">
+        <div class="big">4 days</div>
+        <div class="l">From signal to symptom</div>
+        <div class="d">The typical window between the first deviation and visible tissue loss.</div>
+      </div>
+    </div>
+    <div class="hook fade-up d6">What if the crash was <em>predictable?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 5: SYMBIA LIVE ───── -->
+<div class="slide" id="s5">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b5"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Symbia · Live</div>
+    <h2 class="headline fade-up d1" style="margin-bottom:.3rem">
+      Meet the <em>memory</em> of your reef.
+    </h2>
+    <div class="video-frame fade-up d2">
+      <video controls poster="img/symbia-emblem.png">
+        <source src="video/symbia-live.mp4" type="video/mp4">
+      </video>
+      <div class="placeholder">
+        <div class="corners"></div>
+        <div class="play"></div>
+        <div class="cap">Symbia · Live Demo · 02:30</div>
+      </div>
+    </div>
+    <div class="hook fade-up d3">What does it actually <em>see?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 6: PATTERNS DECODED ───── -->
+<div class="slide" id="s6">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b6"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Ask Anything</div>
+    <h2 class="headline fade-up d1">
+      Ask the tank what it's been <em>trying to tell you.</em>
+    </h2>
+    <div class="chat fade-up d2">
+      <div class="chat-row user">
+        <div class="who">YOU</div>
+        <div class="bubble-msg q">
+          <span class="meta">Reefer · 23:14</span>
+          "My Acropora tenuis has been receding for 10 days. Parameters look fine."
+        </div>
+      </div>
+      <div class="chat-row ai">
+        <div class="who"><img src="img/symbia-emblem.png" alt=""></div>
+        <div class="bubble-msg">
+          <span class="meta">Symbia · pattern matched · 6 weeks · 3 ICPs</span>
+          Alk consumption is up <b>18%</b> over six weeks. Dose unchanged. Your <b>effective</b> Alk is lower than your tested Alk. Recession started <b>4 days</b> after consumption outpaced dose.<br><br>Also flagging <span class="flag">manganese creeping across your last three ICP reports.</span>
+        </div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What else is it <em>tracking?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 7: BLUEPRINT ───── -->
+<div class="slide" id="s7">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b7"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Your Reef · Designed</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>From chasing</span></span><br>
+        <span class="reveal-mask"><span>to <em>running</em> it.</span></span>
+      </h2>
+      <p class="lede fade-up d2">Symbia doesn't just remember. It composes. The next dose, the next water change, the next ICP retest — written by every reading that came before, tuned to the colonies in your tank right now.</p>
+      <div class="hook fade-up d4">What about the things you <em>can't see coming?</em></div>
+    </div>
+    <div class="blueprint fade-up d3">
+      <div class="spec-row">
+        <span class="k">Two-part dose</span>
+        <span class="v">+12% <small>↗ consumption confirmed</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Water change</span>
+        <span class="v">every 9 days <small>↗ nitrate curve aligned</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">ICP flag</span>
+        <span class="v">Manganese <small>↗ retest in 28 days</small></span>
+      </div>
+      <div class="spec-row">
+        <span class="k">Coralline forecast</span>
+        <span class="v">moderate <small>↗ Ca + Alk aligned</small></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 8: EARLY WARNING ───── -->
+<div class="slide" id="s8">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b8"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Before RTN · Before The Crash</div>
+    <h2 class="headline fade-up d1">
+      The moment your reef deviates from <em>its own pattern</em> — you'll know.
+    </h2>
+    <p class="lede fade-up d2" style="text-align:center;margin:0 auto">Snap a photo of a pale tip or receding edge. Symbia cross-references your history, your parameter trend, and a pattern library — then tells you, in plain language, exactly what's happening.</p>
+    <div class="alert-card fade-up d3">
+      <div class="tag">⚠ Symbia · Risk Detected</div>
+      <div class="observed">"Pale tips on Acropora millepora — colour fading at the growth tips over 36 hours."</div>
+      <div class="verdict">
+        <div class="label">Verdict</div>
+        <div class="body">Early <b>photo-bleach under Alk stress</b> — not RTN. <b>Drop alkalinity 0.4 dKH for 72 hours, hold light schedule, retest tomorrow night.</b> Correctable now.</div>
+      </div>
+    </div>
+    <div class="hook fade-up d4">What about chemistry you <em>can't even test at home?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 9: ICP INTELLIGENCE ───── -->
+<div class="slide" id="s9">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b9"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">ICP · Finally Making Sense</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Your ICP results</span></span><br>
+        <span class="reveal-mask"><span><em>mean</em> something now.</span></span>
+      </h2>
+      <p class="lede fade-up d2">Cross-referenced against your coral load, your dosing products, your consumption trend, your tank's full history — not the internet's average reef. <b>Yours specifically.</b></p>
+      <div class="hook fade-up d4">How much to <em>never crash again?</em></div>
+    </div>
+    <div class="icp-card fade-up d3">
+      <div class="icp-row ok">
+        <span class="el"><span class="sym">Ca</span>Calcium</span>
+        <span class="val">432 ppm</span>
+        <span class="stat">In Range</span>
+      </div>
+      <div class="icp-row warn">
+        <span class="el"><span class="sym">Sr</span>Strontium</span>
+        <span class="val">11.2 ppm</span>
+        <span class="stat">Elevated</span>
+      </div>
+      <div class="icp-row bad">
+        <span class="el"><span class="sym">Mn</span>Manganese</span>
+        <span class="val">0.018 ppm</span>
+        <span class="stat">Climbing · 3 ICPs</span>
+      </div>
+      <div class="icp-row warn">
+        <span class="el"><span class="sym">Ba</span>Barium</span>
+        <span class="val">0.094 ppm</span>
+        <span class="stat">Flagged</span>
+      </div>
+      <div class="icp-row ok">
+        <span class="el"><span class="sym">Mg</span>Magnesium</span>
+        <span class="val">1,360 ppm</span>
+        <span class="stat">In Range</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 10: PRICING ───── -->
+<div class="slide" id="s10">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b10"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">Yours · Forever</div>
+    <h2 class="headline fade-up d1">
+      Less than the cost of <em>one crashed Acropora.</em>
+    </h2>
+    <div class="price-grid">
+      <div class="price featured fade-up d2">
+        <span class="tag">One-time · Lifetime</span>
+        <h3>The Symbia Agent</h3>
+        <div class="amount"><span class="big">$97</span><span class="per">/ once</span></div>
+        <p>Your personal, self-learning reef brain. Yours forever — every parameter, every ICP, every photo. Memory + early-warning unlocked.</p>
+      </div>
+      <div class="price fade-up d3">
+        <span class="tag">Membership</span>
+        <h3>Reef Masters</h3>
+        <div class="amount"><span class="big">$19</span><span class="per">/ month</span></div>
+        <p>Live troubleshooting, group ICP runs, frag swap network, parameter office hours. The collective brain behind the agent.</p>
+      </div>
+    </div>
+    <div class="hook fade-up d4">But what if it <em>pays for itself?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 11: REFERRALS ───── -->
+<div class="slide" id="s11">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b11"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">Build Your Circle · Earn</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>Bring in the reefers</span></span><br>
+        <span class="reveal-mask"><span>in your <em>life.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2"><b>30% recurring affiliate</b> — auto-enabled the day you join. No forms, no waiting.</p>
+      <div class="metric-row">
+        <div class="metric fade-up d3"><span class="num">30%</span><span class="desc">recurring · auto-enabled · day one</span></div>
+        <div class="metric fade-up d4"><span class="num">4</span><span class="desc">referrals = <b style="color:var(--mint)">120% ROI</b> — your sub pays you</span></div>
+      </div>
+      <div class="hook fade-up d5" style="margin-top:1.6rem">What if you don't want to <em>touch any of this tech?</em></div>
+    </div>
+    <div class="ref-vis fade-up d3">
+      <div class="ref-orbit outer"></div>
+      <div class="ref-orbit"></div>
+      <div class="ref-center">YOU</div>
+      <div class="ref-node n1">+30%</div>
+      <div class="ref-node n2">+30%</div>
+      <div class="ref-node n3">+30%</div>
+      <div class="ref-node n4">+30%</div>
+      <div class="ref-roi">= 120% ROI</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 12: DONE FOR YOU ───── -->
+<div class="slide" id="s12">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b12"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow fade-up">White-Glove Setup</div>
+      <h2 class="headline" style="margin:1.2rem 0 1.4rem">
+        <span class="reveal-mask"><span>You handle the coral.</span></span><br>
+        <span class="reveal-mask"><span>We handle the <em>install.</em></span></span>
+      </h2>
+      <p class="lede fade-up d2">For the reefer who just wants it working. You never open a terminal. You never touch a config file. Symbia is live and running when we're done.</p>
+      <div class="dfy-steps">
+        <div class="dfy-step fade-up d3"><span class="n">1</span><span class="t">You spin up a <b>$5/mo VPS</b> (Contabo or Hostinger — your cost, your account).</span></div>
+        <div class="dfy-step fade-up d4"><span class="n">2</span><span class="t">Share credentials. We <b>install Symbia, configure your tank profile</b>, and walk out.</span></div>
+        <div class="dfy-step fade-up d5"><span class="n">3</span><span class="t">You log in. <b>Symbia is already learning your reef.</b></span></div>
+      </div>
+    </div>
+    <div class="dfy-price fade-up d3">
+      <span class="tag">One-Time · Done-For-You</span>
+      <h3>White-Glove Install</h3>
+      <div class="big">$297</div>
+      <div class="per">/ one-time setup fee</div>
+      <div class="note">Hosting (~$4–6/mo) is yours. <b>Everything else is ours.</b> Symbia license sold separately.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 13: COLLECTIVE BRAIN ───── -->
+<div class="slide" id="s13">
+  <div class="slide-bg"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b13"></div>
+  <div class="wrap">
+    <div class="eyebrow fade-up">The Collective Brain</div>
+    <h2 class="headline fade-up d1" style="max-width:980px">
+      Where SPS &amp; LPS keepers compare notes <em>at 2am.</em>
+    </h2>
+    <div class="feat-grid">
+      <div class="feat fade-up d2"><div class="icon">⏱</div><h4>Parameter office hours</h4><p>Live drop-ins where master keepers crack open your data with you, in real time.</p></div>
+      <div class="feat fade-up d2"><div class="icon">🜂</div><h4>Crash post-mortems</h4><p>Shared, full-data autopsies of real crashes — so theirs becomes your early warning.</p></div>
+      <div class="feat fade-up d3"><div class="icon">⌬</div><h4>Group ICP runs</h4><p>Bulk panels, bulk pricing, and a live interpretation call when results land.</p></div>
+      <div class="feat fade-up d3"><div class="icon">↻</div><h4>Apex · Trident · DOS</h4><p>Integration updates roll out to Masters first — the moment they ship.</p></div>
+      <div class="feat fade-up d4"><div class="icon">★</div><h4>Frag swap network</h4><p>Trade, gift, rescue. A frag economy run by people who actually grow them.</p></div>
+      <div class="feat fade-up d4"><div class="icon">⇄</div><h4>Tank-buddy system</h4><p>One-to-one chat with another Master. Bench-to-bench help when something's off at 11pm.</p></div>
+    </div>
+    <div class="hook fade-up d5" style="margin-top:.4rem">What happens when your tank data <em>talks to 200 others?</em></div>
+  </div>
+</div>
+
+<!-- ───── SLIDE 14: FINAL CTA ───── -->
+<div class="slide" id="s14">
+  <div class="slide-bg"></div>
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  <div class="mesh"></div>
+  <div class="bubbles" id="b14"></div>
+  <img class="emblem fade-up" src="img/symbia-emblem.png" alt="Symbia">
+  <div class="eyebrow fade-up d1">The Crash Ends Here</div>
+  <h2 class="headline">
+    <span class="reveal-mask"><span>Stop chasing.</span></span><br>
+    <span class="reveal-mask"><span>Start <em>knowing.</em></span></span>
+  </h2>
+  <p class="lede fade-up d2" style="margin:0 auto;text-align:center">Every reading connects to the one before it. Every ICP makes sense against your history. Every early sign gets caught.</p>
+  <div class="cta-row fade-up d3">
+    <a href="#" class="cta primary"><span>Get Symbia · $97</span> <span class="arr">→</span></a>
+    <a href="#" class="cta"><span>Join Reef Masters · $19/mo</span> <span class="arr">→</span></a>
+  </div>
+  <div class="closer fade-up d4">Symbia · The Memory of Your Reef</div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" disabled>←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn">→</button>
+</div>
+<div class="scroll-hint">Scroll · Arrows · Space</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('dots');
+const total=slides.length;
+let current=0;
+for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
+const dots=document.querySelectorAll('.dot');
+
+function goTo(n){
+  if(n===current||n<0||n>=total)return;
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current=n;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  document.getElementById('slideNum').textContent=String(current+1).padStart(2,'0')+' — '+String(total).padStart(2,'0');
+  document.getElementById('progress').style.width=((current+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').disabled=current===total-1;
+}
+document.getElementById('nextBtn').onclick=()=>goTo(current+1);
+document.getElementById('prevBtn').onclick=()=>goTo(current-1);
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key))goTo(Math.min(current+1,total-1));
+  if(['ArrowLeft','PageUp'].includes(e.key))goTo(Math.max(current-1,0));
+  if(e.key==='Home')goTo(0); if(e.key==='End')goTo(total-1);
+});
+let wheelLock=false;
+window.addEventListener('wheel',e=>{
+  if(wheelLock)return;
+  if(Math.abs(e.deltaY)<25)return;
+  wheelLock=true;setTimeout(()=>wheelLock=false,900);
+  goTo(current+(e.deltaY>0?1:-1));
+},{passive:true});
+
+function makeBubbles(id,n){
+  const c=document.getElementById(id);if(!c)return;
+  for(let i=0;i<n;i++){
+    const b=document.createElement('div');b.className='bubble';
+    const s=3+Math.random()*22;
+    b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${-s}px;animation-duration:${6+Math.random()*9}s;animation-delay:${Math.random()*8}s;opacity:0`;
+    c.appendChild(b);
+  }
+}
+if(location.hash){const m=location.hash.match(/s=(\d+)/);if(m)goTo(Math.max(0,Math.min(parseInt(m[1])-1,total-1)))}
+for(let i=1;i<=14;i++) makeBubbles('b'+i, (i===1||i===14)?32:18);
+</script>
+</body>
+</html>
