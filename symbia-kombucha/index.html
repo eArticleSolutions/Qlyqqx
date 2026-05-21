@@ -32,12 +32,24 @@ body::before{
 
 .deck{position:relative;width:100vw;height:100vh;background:var(--ink)}
 .slide{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;overflow:hidden;
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  opacity:0;pointer-events:none;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
   transition:opacity .9s var(--ease);
-  padding:5rem 2rem 6rem;
+  padding:5rem 6rem;
 }
-.slide > *:not(.slide-bg):not(.mesh):not(.bubbles){position:relative;z-index:5}
+.slide > .wrap{
+  position:relative;
+  z-index:5;
+  width:100%;
+  margin-top:auto;
+  margin-bottom:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 .slide.active{opacity:1;pointer-events:all}
 
 /* Photographic background layer (per slide) */
@@ -180,7 +192,7 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
 .dot.active{background:var(--gold);height:20px;border-radius:3px}
 
 /* ───────── SLIDE 1 — HERO ───────── */
-#s1{flex-direction:column;text-align:center;gap:2.2rem}
+#s1 .wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2.2rem}
 #s1 .hero-logo{
   width:min(240px,24vw);max-height:22vh;object-fit:contain;
   filter:drop-shadow(0 10px 40px rgba(232,168,32,.35));
@@ -439,7 +451,7 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
 .feat p{font-size:.85rem;line-height:1.55;color:var(--dim);font-weight:300}
 
 /* ───────── SLIDE 11 — FINAL CTA ───────── */
-#s11{flex-direction:column;text-align:center;gap:2.4rem}
+#s11 .wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2.4rem}
 #s11 .ring{
   position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(232,168,32,.18);
   transform:translate(-50%,-50%);pointer-events:none;animation:pulse 6s var(--ease) infinite;
@@ -529,13 +541,264 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
 .dfy-price .note{font-size:.85rem;color:var(--dim);font-weight:300;margin-top:1.4rem;padding-top:1.2rem;border-top:1px dashed rgba(232,168,32,.2);line-height:1.6}
 .dfy-price .note b{color:var(--text)}
 
-/* Responsive */
-@media(max-width:900px){
-  .slide{padding:5rem 1.2rem 6rem}
-  #s2 .wrap,#s6 .wrap,#s9 .wrap,#s13 .wrap,#s14 .wrap{grid-template-columns:1fr;gap:2.5rem}
-  .batch-rail,.feat-grid,.price-grid,.var-grid{grid-template-columns:1fr 1fr}
-  h1.headline{font-size:2.4rem}
-  h2.headline{font-size:2rem}
+/* ───────── SLIDE 4 MAIN STYLES (MERGED) ───────── */
+#s4 .wrap{max-width:1180px;display:grid;grid-template-columns:1.1fr 1fr;gap:4.5rem;align-items:center;text-align:left}
+#s4 .lede{max-width:none}
+#s4 .lede + .lede{margin-top:1.1rem}
+#s4 .lede b{color:var(--pale);font-weight:500}
+#s4 .lede em{font-family:'Fraunces',serif;font-style:italic;color:var(--cream)}
+.presence{position:relative;aspect-ratio:1/1;max-width:440px;margin:0 auto;width:100%}
+.presence .ring{position:absolute;inset:0;border:1px dashed rgba(232,168,32,.22);border-radius:50%}
+.presence .ring.inner{inset:18%;border-style:solid;border-color:rgba(232,168,32,.18)}
+.presence .ring.core{inset:36%;border-color:rgba(232,168,32,.32);background:radial-gradient(circle,rgba(232,168,32,.08),transparent 70%)}
+.presence .emblem{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.presence .emblem img{width:22%;opacity:.92;filter:drop-shadow(0 0 24px rgba(232,168,32,.35))}
+.presence .chip{
+  position:absolute;display:flex;align-items:center;gap:.55rem;
+  padding:.55rem .9rem;border-radius:999px;
+  background:rgba(18,13,7,.78);border:1px solid rgba(232,168,32,.32);
+  backdrop-filter:blur(6px);
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.22em;
+  color:var(--cream);text-transform:uppercase;white-space:nowrap;
+  box-shadow:0 8px 22px rgba(0,0,0,.45);
+}
+.presence .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.presence .chip.c1{top:6%;left:50%;transform:translateX(-50%)}
+.presence .chip.c2{top:46%;right:-4%}
+.presence .chip.c3{bottom:6%;left:50%;transform:translateX(-50%)}
+.presence .chip.c4{top:46%;left:-4%}
+.presence .chip.more{top:78%;right:8%;border-style:dashed;color:var(--dim)}
+.presence .chip.more .dot{background:var(--dim);box-shadow:none}
+.learn-tag{
+  display:inline-flex;align-items:center;gap:.6rem;margin-top:1.6rem;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;
+  color:var(--gold);text-transform:uppercase;
+}
+.learn-tag::before{content:"";width:24px;height:1px;background:var(--gold)}
+
+/* ───── NAV ARROWS ───── */
+.nav-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 168, 32, 0.25);
+  background: rgba(18, 13, 7, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 300;
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+.nav-arrow svg {
+  transition: transform 0.3s var(--ease);
+}
+.nav-arrow.prev {
+  left: 2rem;
+}
+.nav-arrow.next {
+  right: 2rem;
+}
+.nav-arrow:hover {
+  background: rgba(232, 168, 32, 0.18);
+  border-color: var(--gold);
+  transform: translateY(-50%) scale(1.06);
+}
+.nav-arrow.prev:hover svg {
+  transform: translateX(-2px);
+}
+.nav-arrow.next:hover svg {
+  transform: translateX(2px);
+}
+.nav-arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+.nav-arrow:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+  border-color: rgba(232, 168, 32, 0.08);
+  background: rgba(18, 13, 7, 0.2);
+  transform: translateY(-50%) scale(1);
+  pointer-events: none;
+}
+
+/* ───── RESPONSIVE STYLES ───── */
+@media (max-width: 1024px) {
+  .slide {
+    padding: 6rem 5rem;
+  }
+  #s2 .wrap, #s6 .wrap, #s9 .wrap, #s13 .wrap, #s14 .wrap {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+  .batch-rail, .feat-grid, .price-grid, .var-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  #s4 .wrap {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+    text-align: center;
+  }
+  #s4 .lede {
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .presence {
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 768px) {
+  .slide {
+    padding: 6.5rem 3.5rem 6.5rem;
+  }
+  .nav-arrow {
+    width: 46px;
+    height: 46px;
+    opacity: 0.5;
+  }
+  .nav-arrow.prev {
+    left: 0.5rem;
+  }
+  .nav-arrow.next {
+    right: 0.5rem;
+  }
+  
+  .batch-rail, .feat-grid, .price-grid, .var-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  
+  h1.headline { font-size: clamp(2rem, 5vw, 3rem); }
+  h2.headline { font-size: clamp(1.8rem, 4.5vw, 2.5rem); }
+  .lede { font-size: 0.98rem; }
+  
+  /* Slide 7 Verdict Stacking */
+  .alert-card .verdict {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .alert-card .verdict .label {
+    min-width: auto;
+    padding-top: 0;
+  }
+  
+  /* Slide 2 Orb sizing */
+  .scoby-orb {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .scoby-orb .center-glyph {
+    font-size: 3.8rem;
+  }
+  .scoby-orb .signal {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.55rem;
+  }
+  
+  /* Slide 9 Referrals visualization scaling */
+  .ref-vis {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .ref-center {
+    width: 90px;
+    height: 90px;
+    font-size: 1.15rem;
+  }
+  .ref-node {
+    width: 52px;
+    height: 52px;
+    font-size: 0.58rem;
+  }
+  .ref-roi {
+    font-size: 1.1rem;
+    bottom: -1.5rem;
+  }
+  
+  /* Slide 4 Presence scaling */
+  .presence {
+    max-width: 280px;
+  }
+  .presence .chip {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.58rem;
+  }
+  
+  /* Slide 13 Schedule Engine stacking */
+  .sched-row {
+    grid-template-columns: 80px 1fr;
+    gap: 0.5rem;
+    padding: 0.8rem 0;
+  }
+  .sched-row .day {
+    grid-column: 1 / span 2;
+    justify-self: flex-start;
+    margin-top: 0.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .slide {
+    padding: 6.5rem 1.2rem;
+  }
+  .nav-arrow {
+    display: none; /* Swipe transition is preferred on very narrow devices */
+  }
+  
+  .brand {
+    top: 1rem;
+    left: 1rem;
+  }
+  .brand img {
+    width: 28px;
+    height: 28px;
+  }
+  .brand-text .nm {
+    font-size: 0.85rem;
+  }
+  .brand-text .by {
+    font-size: 0.45rem;
+  }
+  .slide-num {
+    top: 1.4rem;
+    right: 1.2rem;
+    font-size: 0.55rem;
+  }
+  
+  .lede {
+    font-size: 0.95rem;
+  }
+  .hook {
+    font-size: 1.1rem;
+  }
+  
+  .price, .feat, .batch-card, .var-stat, .blueprint, .sched-card, .dfy-price, .alert-card {
+    padding: 1.2rem 1rem;
+  }
+  
+  .chat {
+    padding: 1rem;
+  }
+  .bubble-msg {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+  .bubble-msg.q {
+    font-size: 1.05rem;
+  }
+  
+  .dfy-price .big {
+    font-size: 3rem;
+  }
 }
 </style>
 </head>
@@ -558,13 +821,15 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
   <div class="slide-bg"></div>
   <div class="mesh"></div>
   <div class="bubbles" id="b1"></div>
-  <img class="hero-logo" src="img/symbia-logo.png" alt="Symbia — Spiral of Living Time">
-  <h1 class="headline">
-    <span class="reveal-mask"><span>Brewing kombucha</span></span><br>
-    <span class="reveal-mask"><span>shouldn't be a <em class="strike">lottery</em>.</span></span>
-  </h1>
-  <p class="lede fade-up d3">Where every perfect batch is a fluke you'll never repeat. Where the magic happens — and then quietly disappears, because no one was listening.</p>
-  <div class="hook fade-up d4">Wanna know <em>why?</em></div>
+  <div class="wrap">
+    <img class="hero-logo" src="img/symbia-logo.png" alt="Symbia — Spiral of Living Time">
+    <h1 class="headline">
+      <span class="reveal-mask"><span>Brewing kombucha</span></span><br>
+      <span class="reveal-mask"><span>shouldn't be a <em class="strike">lottery</em>.</span></span>
+    </h1>
+    <p class="lede fade-up d3">Where every perfect batch is a fluke you'll never repeat. Where the magic happens — and then quietly disappears, because no one was listening.</p>
+    <div class="hook fade-up d4">Wanna know <em>why?</em></div>
+  </div>
 </div>
 
 <!-- ───── SLIDE 2: HIDDEN CODE ───── -->
@@ -656,45 +921,6 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
   <div class="slide-bg"></div>
   <div class="mesh"></div>
   <div class="bubbles" id="b4"></div>
-  <style>
-    #s4 .wrap{max-width:1180px;display:grid;grid-template-columns:1.1fr 1fr;gap:4.5rem;align-items:center;text-align:left}
-    #s4 .lede{max-width:none}
-    #s4 .lede + .lede{margin-top:1.1rem}
-    #s4 .lede b{color:var(--pale);font-weight:500}
-    #s4 .lede em{font-family:'Fraunces',serif;font-style:italic;color:var(--cream)}
-    .presence{position:relative;aspect-ratio:1/1;max-width:440px;margin:0 auto;width:100%}
-    .presence .ring{position:absolute;inset:0;border:1px dashed rgba(232,168,32,.22);border-radius:50%}
-    .presence .ring.inner{inset:18%;border-style:solid;border-color:rgba(232,168,32,.18)}
-    .presence .ring.core{inset:36%;border-color:rgba(232,168,32,.32);background:radial-gradient(circle,rgba(232,168,32,.08),transparent 70%)}
-    .presence .emblem{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-    .presence .emblem img{width:22%;opacity:.92;filter:drop-shadow(0 0 24px rgba(232,168,32,.35))}
-    .presence .chip{
-      position:absolute;display:flex;align-items:center;gap:.55rem;
-      padding:.55rem .9rem;border-radius:999px;
-      background:rgba(18,13,7,.78);border:1px solid rgba(232,168,32,.32);
-      backdrop-filter:blur(6px);
-      font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.22em;
-      color:var(--cream);text-transform:uppercase;white-space:nowrap;
-      box-shadow:0 8px 22px rgba(0,0,0,.45);
-    }
-    .presence .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
-    .presence .chip.c1{top:6%;left:50%;transform:translateX(-50%)}
-    .presence .chip.c2{top:46%;right:-4%}
-    .presence .chip.c3{bottom:6%;left:50%;transform:translateX(-50%)}
-    .presence .chip.c4{top:46%;left:-4%}
-    .presence .chip.more{top:78%;right:8%;border-style:dashed;color:var(--dim)}
-    .presence .chip.more .dot{background:var(--dim);box-shadow:none}
-    .learn-tag{
-      display:inline-flex;align-items:center;gap:.6rem;margin-top:1.6rem;
-      font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;
-      color:var(--gold);text-transform:uppercase;
-    }
-    .learn-tag::before{content:"";width:24px;height:1px;background:var(--gold)}
-    @media (max-width:900px){
-      #s4 .wrap{grid-template-columns:1fr;gap:2.5rem;text-align:center}
-      .presence{max-width:340px}
-    }
-  </style>
   <div class="wrap">
     <div>
       <div class="eyebrow fade-up">Always Present · Always Learning</div>
@@ -957,42 +1183,47 @@ h2.headline{font-size:clamp(2.4rem,5.2vw,4.4rem)}
   <div class="ring"></div><div class="ring"></div><div class="ring"></div>
   <div class="mesh"></div>
   <div class="bubbles" id="b11"></div>
-  <img class="emblem fade-up" src="img/symbia-emblem.png" alt="Symbia">
-  <h2 class="headline">
-    <span class="reveal-mask"><span>Unlock your SCOBY's</span></span><br>
-    <span class="reveal-mask"><span><em>memory</em>.</span></span>
-  </h2>
-  <p class="lede fade-up d2" style="margin:0 auto;text-align:center">The lottery ends here. Every batch from now on remembers the last — and teaches the next.</p>
-  <div class="cta-row fade-up d3">
-    <a href="#" class="cta primary"><span>Get Symbia · $97</span> <span class="arr">→</span></a>
-    <a href="#" class="cta"><span>Join the Masters Community</span> <span class="arr">→</span></a>
+  <div class="wrap">
+    <img class="emblem fade-up" src="img/symbia-emblem.png" alt="Symbia">
+    <h2 class="headline">
+      <span class="reveal-mask"><span>Unlock your SCOBY's</span></span><br>
+      <span class="reveal-mask"><span><em>memory</em>.</span></span>
+    </h2>
+    <p class="lede fade-up d2" style="margin:0 auto;text-align:center">The lottery ends here. Every batch from now on remembers the last — and teaches the next.</p>
+    <div class="cta-row fade-up d3">
+      <a href="#" class="cta primary"><span>Get Symbia · $97</span> <span class="arr">→</span></a>
+      <a href="#" class="cta"><span>Join the Masters Community</span> <span class="arr">→</span></a>
+    </div>
+    <div class="closer fade-up d4">Symbia · Spiral of Living Time</div>
   </div>
-  <div class="closer fade-up d4">Symbia · Spiral of Living Time</div>
 </div>
 
 </div>
 
-<div class="nav">
-  <button class="nav-btn" id="prevBtn" disabled>←</button>
-  <div class="dots" id="dots"></div>
-  <button class="nav-btn" id="nextBtn">→</button>
-</div>
+<button class="nav-arrow prev" id="prevBtn" disabled aria-label="Previous Slide">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </svg>
+</button>
+
+<button class="nav-arrow next" id="nextBtn" aria-label="Next Slide">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+    <polyline points="12 5 19 12 12 19"></polyline>
+  </svg>
+</button>
 
 <script>
 const slides=document.querySelectorAll('.slide');
-const dotsEl=document.getElementById('dots');
 const total=slides.length;
 let current=0;
-for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
-const dots=document.querySelectorAll('.dot');
 
 function goTo(n){
   if(n===current||n<0||n>=total)return;
   slides[current].classList.remove('active');
-  dots[current].classList.remove('active');
   current=n;
   slides[current].classList.add('active');
-  dots[current].classList.add('active');
   document.getElementById('slideNum').textContent=String(current+1).padStart(2,'0')+' — '+String(total).padStart(2,'0');
   document.getElementById('progress').style.width=((current+1)/total*100)+'%';
   document.getElementById('prevBtn').disabled=current===0;
@@ -1012,6 +1243,28 @@ window.addEventListener('wheel',e=>{
   wheelLock=true;setTimeout(()=>wheelLock=false,900);
   goTo(current+(e.deltaY>0?1:-1));
 },{passive:true});
+
+// Swipe gestures
+let touchStartX = 0;
+let touchEndX = 0;
+
+function handleGesture() {
+  if (touchEndX < touchStartX - 50) {
+    goTo(Math.min(current + 1, total - 1));
+  }
+  if (touchEndX > touchStartX + 50) {
+    goTo(Math.max(current - 1, 0));
+  }
+}
+
+document.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleGesture();
+}, {passive: true});
 
 function makeBubbles(id,n){
   const c=document.getElementById(id);if(!c)return;
