@@ -1,383 +1,579 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qlyqqx — Build Less. Automate More.</title>
-    <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --card-bg: #141414;
-            --accent-color: #00f5b8;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --border-color: #262626;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Qlyqqx — Intelligence for Complex Systems</title>
+<meta name="description" content="Qlyqqx is the umbrella for intelligence systems built to manage living, complex processes — Symbia, Wisp, and Wrapp. Precision in the quiet." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-outer: #09182e;
+    --bg: #0a192f;
+    --card: #112240;
+    --card-hover: #162a46;
+    --fg: #cad4f4;
+    --fg-soft: #a3adcc;
+    --muted: #8b96b4;
+    --tag: #64718e;
+    --primary: #64ffda;
+    --primary-muted: #5fefd0;
+    --primary-deep: #3a9089;
+    --primary-wash: rgba(100,255,218,0.08);
+    --border: #233554;
+    --mono: 'JetBrains Mono', 'Courier New', monospace;
+    --sans: 'Inter', system-ui, sans-serif;
+    --serif: 'Cormorant Garamond', serif;
+  }
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    background: var(--bg-outer);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--primary); text-decoration: none; transition: color .2s ease; }
+  a:hover { color: var(--primary-muted); }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+  }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+  /* Nav */
+  .nav {
+    padding: 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .nav .brand { color: var(--primary); font-weight: 500; }
+  .nav .quiet { color: var(--tag); }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: -10%;
-            right: -10%;
-            width: 40%;
-            height: 40%;
-            background: radial-gradient(circle, rgba(0, 245, 184, 0.05) 0%, transparent 70%);
-            z-index: -1;
-        }
+  /* Hero */
+  .hero {
+    padding: 40px 0 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    color: var(--primary);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .hero-image-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 11;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(100,255,218,0.05);
+  }
+  .hero-image-wrap img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    opacity: 0.92;
+  }
+  .hero-image-wrap::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(10,25,47,0) 40%, rgba(10,25,47,0.7) 100%);
+    pointer-events:none;
+  }
+  .hero-title {
+    position: absolute;
+    right: clamp(18px, 4vw, 44px);
+    bottom: clamp(14px, 3vw, 34px);
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(3.2rem, 8vw, 6rem);
+    line-height: 0.95;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+    z-index: 2;
+  }
+  .hero-title span { color: var(--primary); }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 60px 24px;
-        }
+  .hero-tagline {
+    text-align: center;
+    padding: 8px 0 0;
+  }
+  .hero-tagline h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    color: var(--fg-soft);
+    font-style: italic;
+    letter-spacing: 0.01em;
+  }
 
-        header {
-            text-align: center;
-            margin-bottom: 80px;
-        }
+  .hero-claim {
+    max-width: 760px;
+    margin: 56px auto 0;
+    text-align: center;
+  }
+  .hero-claim p {
+    color: var(--fg-soft);
+    font-size: 1.05rem;
+    margin-bottom: 18px;
+  }
+  .hero-claim .mono-line {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--primary);
+    letter-spacing: 0.08em;
+    margin: 28px 0 18px;
+  }
+  .hero-claim .closer {
+    color: var(--primary-muted);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    margin-top: 24px;
+  }
 
-        .logo {
-            max-width: 300px;
-            height: auto;
-            margin-bottom: 30px;
-        }
+  /* Section base */
+  section { padding: 96px 0; }
+  .section-eyebrow {
+    font-family: var(--mono);
+    color: var(--primary);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: var(--fg);
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+  }
+  .section-lede {
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 56px;
+  }
 
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 16px;
-            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+  /* Parent product blocks */
+  .product-group { margin-bottom: 88px; }
+  .product-group:last-child { margin-bottom: 0; }
 
-        .hero-subtitle {
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            font-weight: 500;
-            margin-bottom: 40px;
-        }
+  .product-head {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    gap: 28px;
+    align-items: start;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .product-logo {
+    width: 88px; height: 88px;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: block;
+  }
+  .product-head h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.9rem;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .product-head .subtitle {
+    font-family: var(--mono);
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .product-head p {
+    color: var(--fg-soft);
+    max-width: 760px;
+  }
 
-        .hero-image {
-            width: 100%;
-            max-width: 1000px;
-            height: auto;
-            border-radius: 24px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 245, 184, 0.1);
-            margin-bottom: 40px;
-        }
+  /* Cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    transition: transform .25s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease;
+    position: relative;
+  }
+  .card:hover {
+    background: var(--card-hover);
+    border-color: var(--primary-deep);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+  }
+  .card .index {
+    font-family: var(--mono);
+    color: var(--primary);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    margin-bottom: 14px;
+  }
+  .card h4 {
+    font-family: var(--serif);
+    font-weight: 500;
+    color: var(--fg);
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .card .card-tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .card p {
+    color: var(--fg-soft);
+    font-size: 0.95rem;
+    margin-bottom: 22px;
+    flex-grow: 1;
+  }
+  .card .go {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--primary);
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card .go::after {
+    content: '→';
+    transition: transform .2s ease;
+  }
+  .card:hover .go::after { transform: translateX(4px); }
 
-        .section {
-            margin-top: 100px;
-        }
+  /* Quick choose */
+  .quick {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .quick-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 40px;
+  }
+  .quick-cols h5 {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .quick-cols ul { list-style: none; }
+  .quick-cols li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .quick-cols li a {
+    color: var(--fg-soft);
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .quick-cols li a:hover { color: var(--primary); }
+  .quick-cols li a::after { content: '→'; color: var(--primary); }
 
-        .section h2 {
-            font-size: 2rem;
-            color: var(--text-primary);
-            margin-bottom: 30px;
-            border-left: 4px solid var(--accent-color);
-            padding-left: 20px;
-        }
+  /* Lens */
+  .lens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+    margin-top: 36px;
+  }
+  .lens {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 32px 28px;
+  }
+  .lens h6 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .lens p { color: var(--fg-soft); font-size: 0.95rem; }
+  .lens ul { margin-top: 14px; padding-left: 18px; color: var(--muted); font-size: 0.9rem; }
+  .lens ul li { margin-bottom: 6px; }
+  .lens ul li strong { color: var(--primary-muted); font-weight: 500; }
 
-        p {
-            font-size: 1.15rem;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
+  /* Footer */
+  footer {
+    padding: 60px 0 40px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--tag);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+  }
+  footer .copy { color: var(--primary); margin-bottom: 6px; }
 
-        .highlight-text {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-top: 40px;
-        }
-
-        .process-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        @media (max-width: 850px) {
-            .grid, .process-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 32px;
-            border-radius: 16px;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-
-        .card h3 {
-            color: var(--accent-color);
-            margin-bottom: 16px;
-            font-size: 1.2rem;
-        }
-
-        .icon-box {
-            width: 48px;
-            height: 48px;
-            background: rgba(0, 245, 184, 0.1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-            color: var(--accent-color);
-        }
-
-        .icon-box svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .list-items {
-            list-style: none;
-            margin: 30px 0;
-        }
-
-        .list-items li {
-            margin-bottom: 16px;
-            padding-left: 30px;
-            position: relative;
-            color: var(--text-primary);
-            font-size: 1.1rem;
-        }
-
-        .list-items li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--accent-color);
-            font-size: 1.5rem;
-            line-height: 1;
-        }
-
-        .step-content strong {
-            color: var(--text-primary);
-            display: block;
-            margin-bottom: 8px;
-            font-size: 1.2rem;
-        }
-
-        .form-box {
-            margin-top: 60px;
-            padding: 48px;
-            background: linear-gradient(145deg, #111, #0a0a0a);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .form-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 16px;
-            margin-bottom: 20px;
-            background: #0d0d0d;
-            border: 1px solid var(--border-color);
-            color: #fff;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        button {
-            width: 100%;
-            padding: 18px;
-            background: var(--accent-color);
-            color: var(--bg-color);
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        button:hover {
-            transform: scale(1.01);
-            box-shadow: 0 0 20px rgba(0, 245, 184, 0.3);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 100px;
-            padding: 60px 0;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            letter-spacing: 0.05em;
-        }
-
-        footer strong {
-            color: var(--accent-color);
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2.2rem; }
-            .form-box { padding: 24px; }
-        }
-    </style>
+  @media (max-width: 640px) {
+    .product-head { grid-template-columns: 64px 1fr; gap: 18px; }
+    .product-logo { width: 64px; height: 64px; }
+    .hero-title { font-size: clamp(2.6rem, 14vw, 4rem); }
+  }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <img src="qlyqqx_green_logo.png" alt="Qlyqqx Logo" class="logo">
-        <h1>You're not paying for apps.<br>You're paying for the guilt of not cancelling them.</h1>
-        <p class="hero-subtitle">There's a fix. It costs less than one month of the tools you're about to cancel anyway.</p>
-        <img src="qlyqqx_hero_image.png" alt="Qlyqqx Hero Image" class="hero-image">
-    </header>
+<header class="container nav">
+  <div class="brand">QLYQQX</div>
+  <div class="quiet">A QUIETORE SYSTEM</div>
+</header>
 
-    <div class="section">
-        <h2>The Problem</h2>
-        <p>Your fitness app still doesn't know you work nights. Your writing tool sounds like a press release. Your "automation" platform somehow made everything more manual. You bought these things to get time back. What you got was a longer list of things to maintain.</p>
-        <p>Here's the truth: those apps were never built for you. They were built for a version of you someone in a marketing meeting imagined — tidy schedule, consistent habits, plenty of patience for onboarding videos. That person doesn't exist. And you've been paying for their subscription.</p>
+<main class="container">
+
+  <!-- HERO -->
+  <section class="hero" style="padding-top:8px;">
+    <div>
+      <div class="hero-image-wrap">
+        <img src="img/hero.jpg" alt="Abstract mint filaments forming a living network on deep navy" />
+        <div class="hero-title">Q<span>ly</span>qqx</div>
+      </div>
+      <div class="hero-tagline">
+        <h2>Intelligence for Complex Systems</h2>
+      </div>
+
+      <div class="hero-claim">
+        <p>Qlyqqx is the umbrella for systems that help you manage living, complex processes — not just static workflows.</p>
+        <div class="mono-line">SYMBIA · WISP · WRAPP — by Qlyqqx</div>
+        <p>Each is a self‑contained intelligence layer built on the Hermes Agent backbone (Nous Research), with its own product‑specific Whop community and one‑time purchase path.</p>
+        <p class="closer">This is not a generic productivity suite. This is precision intelligence for systems most tools were never built to handle.</p>
+      </div>
     </div>
+  </section>
 
-    <div class="section">
-        <h2>The Solution</h2>
-        <p class="highlight-text" style="font-size: 1.4rem;">Get an AI agent built around the real version of you.</p>
-        <p>Not software. Not a template. Not a course on how to build it yourself. Describe the exact thing eating your time or your money — an agent gets built around it, connected to the tools you already use, running quietly in the background. You own it. It doesn't own your credit card.</p>
-        <p>One payment for the build. After that, you pay only for what the AI actually uses. Most people land between $5 and $15 a month. Some spend less than a coffee.</p>
-    </div>
+  <!-- SYSTEMS -->
+  <section id="systems" style="padding-top:40px;">
+    <div class="section-eyebrow">01 / The Systems</div>
+    <h2 class="section-title">Three intelligence layers. One backbone.</h2>
+    <p class="section-lede">Each product below has its own landing page, with full product detail, examples, and checkout. Use the cards to jump straight to the one that matches your world.</p>
 
-    <div class="section">
-        <h2>See it in practice</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>YOUTUBER · 47K SUBSCRIBERS</h3>
-                <p>Three hours a day in the comments — replying, chasing ideas, trying to read the room. Now an agent reads the room for her. It drafts replies in her voice and surfaces video ideas based on what's actually getting traction. She reviews, approves, moves on. Three hours became twenty minutes.</p>
-                <p class="highlight-text" style="margin-top: 16px;">One-time build: $400<br>Monthly AI usage: $6</p>
-            </div>
-            <div class="card">
-                <h3>FREELANCE WRITER</h3>
-                <p>Eighty dollars a month across three tools — SEO, grammar, outlines — and still doing all the thinking himself. Now one workflow takes a brief and returns a structured draft he can actually use. Not a finished article. A real starting point, first time, every time.</p>
-                <p class="highlight-text" style="margin-top: 16px;">One-time build: $350<br>Monthly AI usage: $5</p>
-            </div>
-            <div class="card">
-                <h3>FITNESS ENTHUSIAST</h3>
-                <p>A $120 app sending the same push notification every morning — didn't matter if she'd slept four hours or had a rest day. Her agent connects to her calendar and her smart scale, adjusts her training around her actual week, and messages her on Discord when she's drifting. It knows her routine. The $120 app never did.</p>
-                <p class="highlight-text" style="margin-top: 16px;">One-time build: $400<br>Monthly AI usage: $8</p>
-            </div>
+    <!-- SYMBIA -->
+    <div class="product-group">
+      <div class="product-head">
+        <img src="img/symbia.png" alt="Symbia logo placeholder" class="product-logo" />
+        <div>
+          <h3>Symbia by Qlyqqx</h3>
+          <div class="subtitle">Intelligence for Biological Systems</div>
+          <p>Symbia by Qlyqqx helps you monitor and stabilize the living biological systems you already manage: kombucha vats, homebrew, sourdough starters, aquariums, and mushroom grows. Each Symbia niche is a separate, one‑time‑purchase product with its own Whop community.</p>
         </div>
+      </div>
+
+      <div class="cards">
+        <a href="/symbia-kombucha/" class="card">
+          <div class="index">01.1</div>
+          <h4>Symbia Kombucha</h4>
+          <div class="card-tag">For Kombucha Brewers</div>
+          <p>Learns your SCOBY's rhythms, tracks fermentation conditions, and flags issues before a batch spoils. For brewers who want more consistency and fewer mystery crashes.</p>
+          <span class="go">Go to Symbia Kombucha</span>
+        </a>
+        <a href="/symbia-homebrew/" class="card">
+          <div class="index">01.2</div>
+          <h4>Symbia Homebrew</h4>
+          <div class="card-tag">For Beer & Homebrew</div>
+          <p>Tracks fermentation variables, warns of stuck or slow ferments, and helps you repeat your best recipes with confidence — without drowning in spreadsheets.</p>
+          <span class="go">Go to Symbia Homebrew</span>
+        </a>
+        <a href="/symbia-reef/" class="card">
+          <div class="index">01.3</div>
+          <h4>Symbia Reef</h4>
+          <div class="card-tag">For Saltwater & Coral Aquariums</div>
+          <p>Monitors key water and tank parameters, learns what "stable" looks like for your reef, and alerts you before tiny shifts turn into major crashes.</p>
+          <span class="go">Go to Symbia Aquarium</span>
+        </a>
+        <a href="/symbia-sourdough/" class="card">
+          <div class="index">01.4</div>
+          <h4>Symbia Sourdough</h4>
+          <div class="card-tag">For Sourdough Bakers</div>
+          <p>Tracks your starter conditions, build‑times, and environment so you can dial in consistent, predictable loaves — not fridge‑shelf‑or‑nothing outcomes.</p>
+          <span class="go">Go to Symbia Sourdough</span>
+        </a>
+        <a href="/symbia-mushroom/
+		" class="card">
+          <div class="index">01.5</div>
+          <h4>Symbia Mushroom</h4>
+          <div class="card-tag">For Mushroom Growers</div>
+          <p>Tracks substrate conditions, humidity, contamination risk, and fruiting cycles so you can grow more consistently and avoid lost batches.</p>
+          <span class="go">Go to Symbia Mushrooms</span>
+        </a>
+      </div>
     </div>
 
-    <div class="section">
-        <h2>What it costs</h2>
-        <p class="highlight-text">One fee to build it. That's the last bill with anyone else's name on it.</p>
-        
-        <div class="grid">
-            <div class="card">
-                <h3>Simple</h3>
-                <p>One app, one workflow, one problem gone</p>
-                <p class="highlight-text" style="margin-top: 16px; font-size: 1.5rem;">$300</p>
-            </div>
-            <div class="card">
-                <h3>Connected</h3>
-                <p>Two to three apps with AI reasoning between them</p>
-                <p class="highlight-text" style="margin-top: 16px; font-size: 1.5rem;">$400</p>
-            </div>
-            <div class="card">
-                <h3>Full build</h3>
-                <p>Multiple workflows, calendar awareness, active learning</p>
-                <p class="highlight-text" style="margin-top: 16px; font-size: 1.5rem;">$500</p>
-            </div>
+    <!-- WISP -->
+    <div class="product-group">
+      <div class="product-head">
+        <img src="img/wisp.png" alt="Wisp logo placeholder" class="product-logo" />
+        <div>
+          <h3>Wisp by Qlyqqx</h3>
+          <div class="subtitle">Intelligence for Learning Systems</div>
+          <p>Wisp by Qlyqqx is the intelligence layer for students and teachers who want a learning environment that grows with them, not resets every term. Each Wisp role is a separate, one‑time‑purchase product with its own community.</p>
         </div>
-        <p style="margin-top: 24px;">After any of those, your only ongoing cost is actual AI usage — typically $5 to $15 a month. No retainer. No subscription. No maintenance fee. The agent is yours and it runs without you feeding it money every month.</p>
+      </div>
+
+      <div class="cards">
+        <a href="/wisp-aris/" class="card">
+          <div class="index">02.1</div>
+          <h4>Wisp Aris</h4>
+          <div class="card-tag">For Students</div>
+          <p>Breaks down complex material, recommends personalized practice, and builds evolving study plans that actually stick — so you study smarter, not harder.</p>
+          <span class="go">Go to Wisp Aris</span>
+        </a>
+        <a href="/wisp-ocrat/" class="card">
+          <div class="index">02.2</div>
+          <h4>Wisp Ocrat</h4>
+          <div class="card-tag">For Teachers</div>
+          <p>Helps you monitor class comprehension, spot falling‑behind students early, and personalize support at scale — without drowning in grading and spreadsheets.</p>
+          <span class="go">Go to Wisp Ocrates</span>
+        </a>
+      </div>
     </div>
 
-    <div class="section">
-        <h2>Tell me the one thing you'd pay to stop doing?</h2>
-        <p>Name it. The app that's failing you. The task that keeps landing back on your plate. The part of your week you'd genuinely pay to get back. Drop it in the form below — you'll get a straight answer on what it would take to solve it, the exact cost, and a realistic number for monthly AI spend. No call required. Response within 24 hours.</p>
-        <p>This is for individuals — one person, one problem, done properly. Not agencies. Not teams. Just you, finally getting the one thing those apps promised and never delivered.</p>
-
-        <div class="form-box">
-            <form action="/api/contact" method="POST">
-                <input name="Your Name" placeholder="Your Name" required />
-                <input name="Email Address" type="email" placeholder="Email Address" required />
-                <input name="Company Name (optional)" placeholder="Company Name (optional)" />
-                <textarea name="What would you like to automate?" rows="5" placeholder="What would you like to automate?" required></textarea>
-                <button type="submit">Request Automation</button>
-            </form>
+    <!-- WRAPP -->
+    <div class="product-group">
+      <div class="product-head">
+        <img src="img/wrapp.png" alt="Wrapp logo placeholder" class="product-logo" />
+        <div>
+          <h3>Wrapp by Qlyqqx</h3>
+          <div class="subtitle">Intelligence for UGC Ad Creators</div>
+          <p>Wrapp by Qlyqqx is the system for creators and teams who run UGC‑based ad pipelines at scale. One product, one landing page, one community. Built to help you land deals faster and ship content without the usual chaos.</p>
         </div>
+      </div>
+
+      <div class="cards">
+        <a href="/wrapp/" class="card" style="max-width:420px;">
+          <div class="index">03.1</div>
+          <h4>Wrapp by Qlyqqx</h4>
+          <div class="card-tag">For UGC Ad Creators</div>
+          <p>One product, one landing page, one community. Land deals faster and ship content without the usual chaos.</p>
+          <span class="go">Go to Wrapp by Qlyqqx</span>
+        </a>
+      </div>
     </div>
+  </section>
 
-    <footer>
-        <p>[ <strong>Build Less. Automate More.</strong> ]</p>
-    </footer>
-</div>
+  <!-- UMBRELLA -->
+  <section style="padding-top:0;">
+    <div class="section-eyebrow">02 / The Umbrella</div>
+    <h2 class="section-title">The Qlyqqx Umbrella, in Brief</h2>
+    <div style="max-width:760px; color:var(--fg-soft); font-size:1.02rem;">
+      <p style="margin-bottom:18px;">Qlyqqx is not a product — it's the brand umbrella for these complex living‑system agents.</p>
+      <p style="margin-bottom:18px;">Each product (and every sub‑niche under Symbia, as well as both Wisp roles) is a self‑contained, one‑time‑purchase system.</p>
+      <p>Community access is a separate monthly subscription for each product's Whop community.</p>
+    </div>
+  </section>
+</main>
 
-<script>
-document.querySelector("form").addEventListener("submit", async (e) => {
-  e.preventDefault();
+<!-- QUICK CHOOSE -->
+<section class="quick">
+  <div class="container">
+    <div class="section-eyebrow">03 / Choose Your System</div>
+    <h2 class="section-title">Pick the card that matches your world.</h2>
+    <p class="section-lede">Then go straight to the landing page that solves it.</p>
 
-  const formData = new FormData(e.target);
+    <div class="quick-cols">
+      <div>
+        <h5>// Biological Systems</h5>
+        <ul>
+          <li><a href="/symbia-kombucha/">Symbia Kombucha</a></li>
+          <li><a href="/symbia-homebrew/">Symbia Homebrew</a></li>
+          <li><a href="/symbia-reef/">Symbia Reef</a></li>
+          <li><a href="/symbia-sourdough/">Symbia Sourdough</a></li>
+          <li><a href="symbia-mushroom/">Symbia Mushroom</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>// Learning Systems</h5>
+        <ul>
+          <li><a href="/wisp-aris/">Wisp Aris — Students</a></li>
+          <li><a href="/wisp-ocrat">Wisp Ocrat — Teachers</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>// UGC‑Ad Systems</h5>
+        <ul>
+          <li><a href="/wrapp/">Wrapp by Qlyqqx</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
-  const payload = {
-    name: formData.get("Your Name"),
-    email: formData.get("Email Address"),
-    company: formData.get("Company Name (optional)"),
-    request: formData.get("What would you like to automate?")
-  };
+<!-- LENS -->
+<main class="container">
+  <section>
+    <div class="section-eyebrow">04 / The Quietore Lens</div>
+    <h2 class="section-title">Quietore = Quiet + Core.</h2>
+    <p class="section-lede">Quick reminder of the lens behind every Qlyqqx system.</p>
 
-  await fetch("/api/contact", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
+    <div class="lens-grid">
+      <div class="lens">
+        <h6>Quiet</h6>
+        <p>Qlyqqx agents work in the background, not in your face. They surface only what needs your attention.</p>
+      </div>
+      <div class="lens">
+        <h6>Core</h6>
+        <p>Each product goes straight to the center of its domain:</p>
+        <ul>
+          <li><strong>Symbia</strong> — stability and rhythm of living systems.</li>
+          <li><strong>Wisp</strong> — comprehension and intervention in learning.</li>
+          <li><strong>Wrapp</strong> — deal velocity and content flow.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
 
-  alert("Request sent");
-  e.target.reset();
-});
-</script>
+<footer>
+  <div class="copy">© QUIETORE</div>
+  <div>PRECISION IN THE QUIET</div>
+</footer>
 
 </body>
 </html>

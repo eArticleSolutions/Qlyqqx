@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Glove Install · Wrapp Studio</title>
+<link rel="icon" href="img/wrapp_logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#7CC637; --green-bright:#A8E635; --green-deep:#3D6B14; --green-dark:#1A2A0A;
+  --gold:#E8C547; --gold-warm:#C9A227;
+  --ink:#050805; --ink-2:#0A0F08; --ink-3:#10180C;
+  --cream:#F0F4D8; --text:#D9E0C2; --dim:#8A9670; --muted:#5C6B45;
+  --danger:#D6553A;
+  --ease:cubic-bezier(.7,.05,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  font-family:'Inter',sans-serif;background:var(--ink);color:var(--text);-webkit-font-smoothing:antialiased;
+  min-height:100vh;position:relative;overflow-x:hidden;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:200;mix-blend-mode:overlay;opacity:.15;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.9 0 0 0 0 0.3 0 0 0 0.6 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:150;
+  background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.65) 100%);
+}
+.bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:url("img/bg-glove.jpg") center/cover no-repeat;
+  transform:scale(1.08);animation:kb 28s var(--ease) infinite alternate;
+}
+.bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(5,8,5,.55) 0%, rgba(5,8,5,.94) 80%);}
+@keyframes kb{0%{transform:scale(1.08)}100%{transform:scale(1.15) translate(-1%,1%)}}
+
+.mesh{
+  position:fixed;inset:-10%;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(at 20% 30%, rgba(124,198,55,.12), transparent 55%),
+    radial-gradient(at 80% 70%, rgba(232,197,71,.08), transparent 60%);
+  filter:blur(60px);mix-blend-mode:screen;
+}
+
+.brand{position:fixed;top:1.1rem;left:1.4rem;display:flex;align-items:center;gap:.7rem;z-index:300;text-decoration:none}
+.brand img{width:54px;height:54px;object-fit:contain;filter:drop-shadow(0 4px 14px rgba(124,198,55,.5))}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-text .nm{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--green-bright);letter-spacing:.08em}
+.brand-text .by{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;margin-top:2px}
+
+.back{position:fixed;top:1.6rem;right:1.8rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.25em;color:var(--dim);text-transform:uppercase;text-decoration:none;z-index:300;transition:color .2s}
+.back:hover{color:var(--green-bright)}
+
+main{position:relative;z-index:5;max-width:760px;margin:0 auto;padding:7rem 1.5rem 5rem}
+
+header.hero{display:flex;flex-direction:column;gap:1rem;margin-bottom:2.4rem}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.4em;color:var(--green-bright);text-transform:uppercase;display:inline-flex;align-items:center;gap:.8rem}
+.eyebrow::before{content:"";width:36px;height:1px;background:var(--green-bright)}
+h1{font-family:'Playfair Display',serif;font-weight:400;line-height:1.0;letter-spacing:-.025em;color:var(--cream);font-size:clamp(2.4rem,5vw,3.6rem)}
+h1 em{font-style:italic;color:var(--green-bright);font-weight:400}
+.lede{font-size:1.02rem;line-height:1.7;color:var(--text);font-weight:300;max-width:620px}
+.price-pill{display:inline-flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding:.7rem 1.1rem;border:1px solid rgba(232,197,71,.45);background:linear-gradient(180deg,rgba(40,30,8,.6),rgba(5,8,5,.6));border-radius:50px;width:fit-content;backdrop-filter:blur(8px)}
+.price-pill .big{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--green-bright);line-height:1}
+.price-pill .per{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim);letter-spacing:.18em;text-transform:uppercase}
+
+form{
+  display:flex;flex-direction:column;gap:1.1rem;
+  padding:2rem 1.8rem;
+  background:linear-gradient(180deg,rgba(16,24,12,.78),rgba(5,8,5,.82));
+  border:1px solid rgba(124,198,55,.2);border-radius:10px;backdrop-filter:blur(10px);
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.22em;color:var(--green-bright);text-transform:uppercase}
+.field label .req{color:var(--gold);margin-left:.25rem}
+.field .hint{font-size:.72rem;color:var(--dim);line-height:1.4}
+input,select,textarea{
+  font-family:'Inter',sans-serif;font-size:.94rem;color:var(--cream);
+  background:rgba(5,8,5,.55);border:1px solid rgba(124,198,55,.18);border-radius:6px;
+  padding:.75rem .85rem;outline:none;transition:border-color .2s,background .2s;
+  width:100%;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--green-bright);background:rgba(5,8,5,.75)}
+textarea{resize:vertical;min-height:110px;line-height:1.5}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--green-bright) 50%),linear-gradient(135deg,var(--green-bright) 50%,transparent 50%);background-position:calc(100% - 18px) center,calc(100% - 12px) center;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+
+.checkbox{display:flex;align-items:flex-start;gap:.7rem;font-size:.85rem;line-height:1.5;color:var(--text)}
+.checkbox input{width:auto;margin-top:.2rem;accent-color:var(--green-bright)}
+.checkbox a{color:var(--green-bright);text-decoration:underline;text-decoration-color:rgba(124,198,55,.5);text-underline-offset:3px}
+
+.submit{
+  margin-top:.4rem;padding:1rem 1.6rem;
+  background:linear-gradient(90deg,var(--green-deep),var(--green));
+  border:1px solid var(--green-bright);border-radius:50px;
+  color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;
+  cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease);
+  box-shadow:0 10px 30px rgba(124,198,55,.3);
+}
+.submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 36px rgba(124,198,55,.4)}
+.submit:disabled{opacity:.5;cursor:not-allowed}
+
+.alert{padding:.9rem 1.1rem;border-radius:6px;font-size:.88rem;line-height:1.5;display:none}
+.alert.ok{display:block;background:rgba(124,198,55,.12);border:1px solid rgba(124,198,55,.4);color:var(--cream)}
+.alert.err{display:block;background:rgba(214,85,58,.12);border:1px solid rgba(214,85,58,.45);color:#F4C3B6}
+
+.legal{margin-top:1.5rem;font-size:.7rem;color:var(--dim);text-align:center;line-height:1.6}
+.legal a{color:var(--green-bright);text-decoration:none}
+.legal a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="mesh"></div>
+
+<a class="brand" href="index.html">
+  <img src="img/wrapp_logo.png" alt="Wrapp">
+  <div class="brand-text">
+    <span class="nm">Wrapp</span>
+    <span class="by">by Qlyqqx</span>
+  </div>
+</a>
+<a class="back" href="index.html">← Back to deck</a>
+
+<main>
+  <header class="hero">
+    <div class="eyebrow">White Glove Install · Application</div>
+    <h1>You handle the content. <em>We handle the install.</em></h1>
+    <p class="lede">Tell us about your setup. We'll spin Wrapp Studio up on your VPS, configure your sources, plug in your avatar, and hand you a live agent that's already hunting before we close the session.</p>
+    <div class="price-pill"><span class="big">$297</span><span class="per">one-time · done-for-you</span></div>
+  </header>
+
+  <form id="wgForm" novalidate>
+
+    <div class="row">
+      <div class="field">
+        <label for="first_name">First Name <span class="req">*</span></label>
+        <input id="first_name" name="first_name" type="text" autocomplete="given-name" required maxlength="80">
+      </div>
+      <div class="field">
+        <label for="last_name">Last Name <span class="req">*</span></label>
+        <input id="last_name" name="last_name" type="text" autocomplete="family-name" required maxlength="80">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="email">Email <span class="req">*</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" required maxlength="160">
+      </div>
+      <div class="field">
+        <label for="vps_platform">VPS Platform <span class="req">*</span></label>
+        <select id="vps_platform" name="vps_platform" required>
+          <option value="">Select platform…</option>
+          <option value="Contabo">Contabo</option>
+          <option value="Hostinger">Hostinger</option>
+          <option value="Other">Other</option>
+        </select>
+        <span class="hint">This determines the installation process.</span>
+        <div id="custom_vps_container" style="display: none; margin-top: 0.2rem;">
+          <input id="custom_vps" name="custom_vps" type="text" placeholder="Please specify your VPS provider" maxlength="80">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="notes">Any other information</label>
+      <textarea id="notes" name="notes" maxlength="1200" placeholder="Quirks of your workflow, specific requirements, or questions…"></textarea>
+    </div>
+
+    <button class="submit" type="submit" id="submitBtn">Send my application →</button>
+
+    <div class="alert" id="okAlert">Application sent. We'll DM you on Discord (or email) within 24 hours to schedule the install.</div>
+    <div class="alert" id="errAlert">Something went wrong sending your application. Please try again — or email us directly.</div>
+  </form>
+
+  <p class="legal">
+    Wrapp · The AI Agent for Serious UGC Creators ·
+    <a href="https://www.whop.com/wrapp" target="_blank" rel="noopener">whop.com/wrapp</a>
+  </p>
+</main>
+
+<script>
+/* ─────────── Discord webhook config ─────────── */
+/* REPLACE this dummy URL with your real Discord webhook URL.            */
+/* Get one from: Discord → Server Settings → Integrations → Webhooks    */
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1506550013793276047/Ox7w4ZduX2cHKYXAazJVz0i1rwvpC0S40DBTj-GMhtBhh_ij1YmhU82dPvBSUPMxhC7I";
+
+/* The avatar shown next to the webhook message in Discord must be a    */
+/* PUBLIC URL (Discord fetches it server-side). When you publish this   */
+/* page, change this to the absolute URL of the logo on your domain,    */
+/* e.g. https://yourdomain.com/img/wrapp_logo.png                       */
+const WEBHOOK_USERNAME = "Wrapp · White Glove";
+const WEBHOOK_AVATAR_URL = new URL("img/wrapp_logo.png", window.location.href).href;
+/* ────────────────────────────────────────────── */
+
+const form = document.getElementById('wgForm');
+const submitBtn = document.getElementById('submitBtn');
+const okAlert = document.getElementById('okAlert');
+const errAlert = document.getElementById('errAlert');
+const vpsSelect = document.getElementById('vps_platform');
+const customVpsContainer = document.getElementById('custom_vps_container');
+const customVpsInput = document.getElementById('custom_vps');
+
+vpsSelect.addEventListener('change', () => {
+  if (vpsSelect.value === 'Other') {
+    customVpsContainer.style.display = 'block';
+    customVpsInput.required = true;
+    customVpsInput.focus();
+  } else {
+    customVpsContainer.style.display = 'none';
+    customVpsInput.required = false;
+    customVpsInput.value = '';
+  }
+});
+
+form.addEventListener('reset', () => {
+  customVpsContainer.style.display = 'none';
+  customVpsInput.required = false;
+});
+
+function esc(s){ return String(s||'').slice(0,1024); }
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  okAlert.classList.remove('ok'); okAlert.style.display='none';
+  errAlert.classList.remove('err'); errAlert.style.display='none';
+
+  if(!form.checkValidity()){ form.reportValidity(); return; }
+
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+
+  const fullName = `${esc(data.first_name)} ${esc(data.last_name)}`.trim();
+  let vpsPlatform = data.vps_platform;
+  if (vpsPlatform === 'Other' && data.custom_vps) {
+    vpsPlatform = `Other (${data.custom_vps})`;
+  }
+
+  // Build a rich, readable Discord embed
+  const fields = [
+    { name: "Email",            value: esc(data.email)              || "—", inline: true  },
+    { name: "VPS Platform",     value: esc(vpsPlatform)             || "—", inline: true  },
+    { name: "Other Info",       value: esc(data.notes)              || "—", inline: false },
+  ];
+
+  const payload = {
+    username: WEBHOOK_USERNAME,
+    avatar_url: WEBHOOK_AVATAR_URL,
+    content: `**New White Glove application** — ${fullName}`,
+    embeds: [{
+      title: "White Glove Install · $297",
+      description: `**${fullName}** wants Wrapp Studio installed for them.`,
+      color: 0x7CC637,
+      fields,
+      footer: { text: "Wrapp · whiteglove.html", icon_url: WEBHOOK_AVATAR_URL },
+      timestamp: new Date().toISOString()
+    }]
+  };
+
+  submitBtn.disabled = true;
+  const originalLabel = submitBtn.textContent;
+  submitBtn.textContent = "Sending…";
+
+  try {
+    const res = await fetch(DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if(!res.ok && res.status !== 204){
+      throw new Error("Discord webhook returned " + res.status);
+    }
+    okAlert.classList.add('ok'); okAlert.style.display='block';
+    form.reset();
+    submitBtn.textContent = "Sent ✓";
+    setTimeout(()=>{ submitBtn.textContent = originalLabel; submitBtn.disabled = false; }, 2500);
+  } catch (err) {
+    console.error(err);
+    errAlert.classList.add('err'); errAlert.style.display='block';
+    submitBtn.textContent = originalLabel;
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
